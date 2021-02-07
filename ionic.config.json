@@ -1,0 +1,7 @@
+{
+  "name": "eleutherios-ionic",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
