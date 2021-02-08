@@ -19,6 +19,16 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content style="--padding-top:10px">
-  <ion-title text-left>Activity</ion-title>
+<ion-content>
+  <ion-toolbar>
+    <ion-title>Activity</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="forums()" color="danger">
+        <ion-icon slot="icon-only" name="add-circle"></ion-icon>
+      </ion-button>
+      <ion-button (click)="services()" color="primary">
+        <ion-icon slot="icon-only" name="add-circle"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
 </ion-content>

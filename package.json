@@ -13,6 +13,7 @@
   },
   "private": true,
   "dependencies": {
+    "@angular/animations": "^5.2.11",
     "@angular/common": "~11.0.5",
     "@angular/core": "~11.0.5",
     "@angular/fire": "^6.1.4",
@@ -30,6 +31,7 @@
     "firebase": "^8.2.6",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
+    "uninstall": "0.0.0",
     "zone.js": "~0.10.2"
   },
   "devDependencies": {
