@@ -35,14 +35,6 @@ export class LoginPage implements OnInit {
     });
   }
 
-  navigateByRole(role) {
-    if (role == 'BUYER') {
-      this.router.navigateByUrl('/buyer');
-    } else if (role == 'SELLER') {
-      this.router.navigateByUrl('/seller');
-    }
-  }
-
   async login() {
     let loading = await this.loadingCtrl.create({
       message: 'Loading...'
@@ -52,7 +44,7 @@ export class LoginPage implements OnInit {
     this.authService.signIn(this.loginForm.value).subscribe(user => {
       loading.dismiss();
       console.log('after login: ', user);
-      this.navigateByRole(user['role']);
+      this.router.navigateByUrl('/');
     },
     async err => {
       loading.dismiss();
@@ -82,7 +74,7 @@ export class LoginPage implements OnInit {
       toast.present();
       console.log('finished: ', res);
 
-      this.navigateByRole(this.registerForm.value['role']);
+      this.router.navigateByUrl('/');
     }, async err => {
       await loading.dismiss();
 
