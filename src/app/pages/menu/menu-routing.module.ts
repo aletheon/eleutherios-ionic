@@ -13,12 +13,20 @@ const routes: Routes = [
         loadChildren: () => import('../home/home.module').then( m => m.HomePageModule)
       },
       {
+        path: 'forum-new',
+        loadChildren: () => import('../forum-new/forum-new.module').then( m => m.ForumNewPageModule)
+      },
+      {
         path: 'forum-list',
         loadChildren: () => import('../forum-list/forum-list.module').then( m => m.ForumListPageModule)
       },
       {
         path: 'forum-list/:id',
         loadChildren: () => import('../forum-list-details/forum-list-details.module').then( m => m.ForumListDetailsPageModule)
+      },
+      {
+        path: 'service-new',
+        loadChildren: () => import('../service-new/service-new.module').then( m => m.ServiceNewPageModule)
       },
       {
         path: 'service-list',
