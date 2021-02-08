@@ -17,7 +17,6 @@ import { AngularFireAuthGuardModule } from '@angular/fire/auth-guard';
 import { environment } from './../environments/environment';
 
 import { Camera } from '@ionic-native/camera/ngx';
-// import { CartModalPageModule } from './pages/cart-modal/cart-modal.module';
 
 class CameraMock extends Camera {
   getPicture(options) {
@@ -35,8 +34,7 @@ class CameraMock extends Camera {
     AngularFireAuthModule,
     AngularFirestoreModule,
     AngularFireStorageModule,
-    AngularFireAuthGuardModule,
-    // CartModalPageModule
+    AngularFireAuthGuardModule
   ],
   providers: [
     StatusBar,
