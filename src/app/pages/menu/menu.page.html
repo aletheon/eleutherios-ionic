@@ -13,24 +13,20 @@
       <ion-list>
         <ion-menu-toggle auto-hide="false">
           <ion-item>
-            <ion-toolbar>
-              <ion-label [routerLink]="['/menu/forum-list']" [queryParams]="{ mode: 'private' }" routerDirection="root">Forums(0)</ion-label>
-              <ion-buttons slot="end">
-                <ion-button [routerLink]="['/menu/forum-list']" routerDirection="root" color="danger">
-                  <ion-icon slot="icon-only" name="add-circle"></ion-icon>
-                </ion-button>
-              </ion-buttons>
-            </ion-toolbar>
+            <ion-label [routerLink]="['/menu/forum-list']" [queryParams]="{ mode: 'private' }" routerDirection="root">Forums(0)</ion-label>
+            <ion-buttons slot="end">
+              <ion-button [routerLink]="['/menu/forum-list']" routerDirection="root" color="danger">
+                <ion-icon slot="icon-only" name="add-circle"></ion-icon>
+              </ion-button>
+            </ion-buttons>
           </ion-item>
           <ion-item>
-            <ion-toolbar>
-              <ion-label [routerLink]="['/menu/service-list']" [queryParams]="{ mode: 'private' }" routerDirection="root">Services(0)</ion-label>
-              <ion-buttons slot="end">
-                <ion-button [routerLink]="['/menu/service-list']" routerDirection="root" color="primary">
-                  <ion-icon slot="icon-only" name="add-circle"></ion-icon>
-                </ion-button>
-              </ion-buttons>
-            </ion-toolbar>
+            <ion-label [routerLink]="['/menu/service-list']" [queryParams]="{ mode: 'private' }" routerDirection="root">Services(0)</ion-label>
+            <ion-buttons slot="end">
+              <ion-button [routerLink]="['/menu/service-list']" routerDirection="root" color="primary">
+                <ion-icon slot="icon-only" name="add-circle"></ion-icon>
+              </ion-button>
+            </ion-buttons>
           </ion-item>
           <ion-item (click)="signOut()" style="cursor:pointer">
             <ion-label>
