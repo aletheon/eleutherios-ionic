@@ -72,7 +72,6 @@ export class LoginPage implements OnInit {
         message: 'Successfully created new Account'
       });
       toast.present();
-      console.log('finished: ', res);
 
       this.router.navigateByUrl('/');
     }, async err => {

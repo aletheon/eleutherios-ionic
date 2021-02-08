@@ -4,7 +4,7 @@
       <ion-toolbar mode="md">
         <ion-title text-left>
           <ng-container *ngIf="auth.user | async; let userItem">
-            {{ userItem.name }}
+            {{ userItem.displayName }}
           </ng-container>
         </ion-title>
       </ion-toolbar>
@@ -12,7 +12,7 @@
     <ion-content>
       <ion-list>
         <ion-menu-toggle auto-hide="false">
-          <ion-item [routerLink]="p.url" *ngFor="let p of pages" routerDirection="root">
+          <ion-item [routerLink]="p.url" [queryParams]="{ mode: p.mode }" *ngFor="let p of pages" routerDirection="root">
             <ion-label>
               {{ p.title }}
             </ion-label>

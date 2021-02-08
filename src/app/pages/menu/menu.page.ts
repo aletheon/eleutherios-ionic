@@ -11,11 +11,13 @@ export class MenuPage implements OnInit {
   pages = [
     {
       title: 'Forums(0)',
-      url: '/menu/forum-list'
+      url: '/menu/forum-list',
+      mode: 'private'
     },
     {
       title: 'Services(0)',
-      url: '/menu/service-list'
+      url: '/menu/service-list',
+      mode: 'private'
     }
   ];
 
