@@ -35,6 +35,22 @@ const routes: Routes = [
       {
         path: 'service-list/:id',
         loadChildren: () => import('../service-list-details/service-list-details.module').then( m => m.ServiceListDetailsPageModule)
+      },
+      {
+        path: 'tag-list',
+        loadChildren: () => import('../tag-list/tag-list.module').then( m => m.TagListPageModule)
+      },
+      {
+        path: 'block-list',
+        loadChildren: () => import('../block-list/block-list.module').then( m => m.BlockListPageModule)
+      },
+      {
+        path: 'payment-list',
+        loadChildren: () => import('../payment-list/payment-list.module').then( m => m.PaymentListPageModule)
+      },
+      {
+        path: 'receipt-list',
+        loadChildren: () => import('../receipt-list/receipt-list.module').then( m => m.ReceiptListPageModule)
       }
     ]
   },
