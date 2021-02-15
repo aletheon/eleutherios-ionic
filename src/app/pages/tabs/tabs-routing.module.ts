@@ -9,7 +9,7 @@ const routes: Routes = [
     component: TabsPage,
     children: [
       {
-        path: '',
+        path: '', // for routes that end in tabs
         loadChildren: () => import('../home/home.module').then( m => m.HomePageModule)
       },
       {
