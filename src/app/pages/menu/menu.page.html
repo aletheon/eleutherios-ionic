@@ -13,31 +13,31 @@
       <ion-list>
         <ion-menu-toggle auto-hide="false">
           <ion-item>
-            <ion-label [routerLink]="['/menu/forum-list']" [queryParams]="{ mode: 'private' }" routerDirection="root">Forums(0)</ion-label>
+            <ion-label [routerLink]="['/menu/tabs/forum-list']" [queryParams]="{ mode: 'private' }" routerDirection="root">Forums(0)</ion-label>
             <ion-buttons slot="end">
-              <ion-button [routerLink]="['/menu/forum-new']" routerDirection="root" color="danger">
+              <ion-button [routerLink]="['/menu/tabs/forum-new']" routerDirection="root" color="danger">
                 <ion-icon slot="icon-only" name="add-circle"></ion-icon>
               </ion-button>
             </ion-buttons>
           </ion-item>
           <ion-item>
-            <ion-label [routerLink]="['/menu/service-list']" [queryParams]="{ mode: 'private' }" routerDirection="root">Services(0)</ion-label>
+            <ion-label [routerLink]="['/menu/tabs/service-list']" [queryParams]="{ mode: 'private' }" routerDirection="root">Services(0)</ion-label>
             <ion-buttons slot="end">
-              <ion-button [routerLink]="['/menu/service-new']" routerDirection="root" color="primary">
+              <ion-button [routerLink]="['/menu/tabs/service-new']" routerDirection="root" color="primary">
                 <ion-icon slot="icon-only" name="add-circle"></ion-icon>
               </ion-button>
             </ion-buttons>
           </ion-item>
-          <ion-item [routerLink]="['/menu/tag-list']" routerDirection="root">
+          <ion-item [routerLink]="['/menu/tabs/tag-list']" routerDirection="root">
             <ion-label>Tags(0)</ion-label>
           </ion-item>
-          <ion-item [routerLink]="['/menu/block-list']" routerDirection="root">
+          <ion-item [routerLink]="['/menu/tabs/block-list']" routerDirection="root">
             <ion-label>Blocks(0)</ion-label>
           </ion-item>
-          <ion-item [routerLink]="['/menu/payment-list']" routerDirection="root">
+          <ion-item [routerLink]="['/menu/tabs/payment-list']" routerDirection="root">
             <ion-label>Payments(0)</ion-label>
           </ion-item>
-          <ion-item [routerLink]="['/menu/receipt-list']" routerDirection="root">
+          <ion-item [routerLink]="['/menu/tabs/receipt-list']" routerDirection="root">
             <ion-label>Receipts(0)</ion-label>
           </ion-item>
           <ion-item (click)="signOut()" style="cursor:pointer">

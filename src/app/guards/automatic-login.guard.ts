@@ -17,7 +17,7 @@ export class AutomaticLoginGuard implements CanActivate  {
         if (!user) {
           return true;
         } else {
-          this.router.navigateByUrl('/');
+          this.router.navigateByUrl('/menu');
           return false;
         }
       })

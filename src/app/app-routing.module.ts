@@ -13,17 +13,17 @@ const routes: Routes = [
     canActivate: [AutomaticLoginGuard]
   },
   {
-    path: '',
+    path: 'menu',
     canActivate: [AngularFireAuthGuard, UserGuard],
     data: {
       authGuardPipe: redirectUnauthorizedToLogin
     },
-    children: [
-      {
-        path: '',
-        loadChildren: () => import('./pages/menu/menu.module').then( m => m.MenuPageModule)
-      }
-    ]
+    loadChildren: () => import('./pages/menu/menu.module').then( m => m.MenuPageModule)
+  },
+  {
+    path: '',
+    redirectTo: 'login',
+    pathMatch: 'full'
   }
 ];
 

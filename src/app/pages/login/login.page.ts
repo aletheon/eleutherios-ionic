@@ -44,7 +44,7 @@ export class LoginPage implements OnInit {
     this.authService.signIn(this.loginForm.value).subscribe(user => {
       loading.dismiss();
       console.log('after login: ', user);
-      this.router.navigateByUrl('/');
+      this.router.navigateByUrl('/menu');
     },
     async err => {
       loading.dismiss();
@@ -73,7 +73,7 @@ export class LoginPage implements OnInit {
       });
       toast.present();
 
-      this.router.navigateByUrl('/');
+      this.router.navigateByUrl('/menu');
     }, async err => {
       await loading.dismiss();
 
