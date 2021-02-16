@@ -1,7 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { MenuController } from '@ionic/angular';
-import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -10,24 +7,8 @@ import { AuthService } from '../../services/auth.service';
 })
 export class HomePage implements OnInit {
 
-  constructor(public menuCtrl: MenuController, private router: Router, public auth: AuthService) { }
+  constructor() { }
 
   ngOnInit() {
-  }
-
-  openSideMenu() {
-    this.menuCtrl.toggle();
-  }
-
-  home() {
-    this.router.navigateByUrl('/');
-  }
-
-  forums() {
-    this.router.navigateByUrl('/menu/forum-list');
-  }
-
-  services() {
-    this.router.navigateByUrl('/menu/service-list');
   }
 }

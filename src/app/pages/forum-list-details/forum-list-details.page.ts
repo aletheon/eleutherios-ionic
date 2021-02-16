@@ -1,6 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { MenuController } from '@ionic/angular';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-forum-list-details',
@@ -9,24 +7,8 @@ import { Router } from '@angular/router';
 })
 export class ForumListDetailsPage implements OnInit {
 
-  constructor(public menuCtrl: MenuController, private router: Router) { }
+  constructor() { }
 
   ngOnInit() {
-  }
-
-  openSideMenu() {
-    this.menuCtrl.toggle();
-  }
-
-  home() {
-    this.router.navigateByUrl('/');
-  }
-
-  forums() {
-    this.router.navigateByUrl('/menu/forum-list');
-  }
-
-  services() {
-    this.router.navigateByUrl('/menu/service-list');
   }
 }
