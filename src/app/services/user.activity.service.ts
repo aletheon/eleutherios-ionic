@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 
 import { Observable } from 'rxjs';
+import { Activity } from '../models';
 
 @Injectable({
   providedIn: 'root'
@@ -98,7 +99,7 @@ export class UserActivityService {
 
   public delete (parentUserId: string, forumId: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      const activityRef = this.afs.collection(`users/${parentUserId}/activities`).doc(forumId);
+      const activityRef = this.afs.collection<Activity>(`users/${parentUserId}/activities`).doc(forumId);
       activityRef.ref.get().then(doc => {
         if (doc.exists){
           let activity = doc.data();
