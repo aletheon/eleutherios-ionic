@@ -13,7 +13,7 @@
       <ion-list>
         <ion-menu-toggle auto-hide="false">
           <ion-item>
-            <ion-label [routerLink]="['/menu/tabs/forums']" [queryParams]="{ mode: 'private' }" routerDirection="root">Forums(0)</ion-label>
+            <ion-label [routerLink]="['/menu/tabs/forum-list']" [queryParams]="{ mode: 'private' }" routerDirection="root">Forums(0)</ion-label>
             <ion-buttons slot="end">
               <ion-button [routerLink]="['/menu/tabs/forum-new']" routerDirection="root" color="danger">
                 <ion-icon slot="icon-only" name="add-circle"></ion-icon>
@@ -21,7 +21,7 @@
             </ion-buttons>
           </ion-item>
           <ion-item>
-            <ion-label [routerLink]="['/menu/tabs/services']" [queryParams]="{ mode: 'private' }" routerDirection="root">Services(0)</ion-label>
+            <ion-label [routerLink]="['/menu/tabs/service-list']" [queryParams]="{ mode: 'private' }" routerDirection="root">Services(0)</ion-label>
             <ion-buttons slot="end">
               <ion-button [routerLink]="['/menu/tabs/service-new']" routerDirection="root" color="primary">
                 <ion-icon slot="icon-only" name="add-circle"></ion-icon>
