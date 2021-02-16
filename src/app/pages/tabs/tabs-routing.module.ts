@@ -13,15 +13,15 @@ const routes: Routes = [
         loadChildren: () => import('../home/home.module').then( m => m.HomePageModule)
       },
       {
-        path: 'tab1',
+        path: 'home',
         loadChildren: () => import('../home/home.module').then( m => m.HomePageModule)
       },
       {
-        path: 'tab2',
+        path: 'forums',
         loadChildren: () => import('../forum-list/forum-list.module').then( m => m.ForumListPageModule)
       },
       {
-        path: 'tab3',
+        path: 'services',
         loadChildren: () => import('../service-list/service-list.module').then( m => m.ServiceListPageModule)
       },
       {
@@ -68,7 +68,7 @@ const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'tabs/tab1',
+    redirectTo: 'tabs/home',
     pathMatch: 'full'
   }
 ];
