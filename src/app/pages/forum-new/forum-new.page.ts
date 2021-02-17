@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { LoadingController, ToastController, AlertController } from '@ionic/angular';
@@ -6,6 +6,11 @@ import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms'
 import { Router } from '@angular/router';
 
 import { Observable, Subscription, BehaviorSubject, of, from, combineLatest, zip, timer, defer, throwError } from 'rxjs';
+
+// https://edupala.com/ionic-loading-example/
+// ionViewDidEnter
+// ionViewDidLeave
+// ionViewWillUnload
 
 import * as _ from "lodash";
 import {
@@ -34,7 +39,7 @@ import {
   templateUrl: './forum-new.page.html',
   styleUrls: ['./forum-new.page.scss'],
 })
-export class ForumNewPage implements OnInit, OnDestroy, AfterViewInit {
+export class ForumNewPage implements OnInit {
   @ViewChild('main-title', { static: false }) titleRef: ElementRef;
 
   constructor(private fb: FormBuilder,
@@ -59,41 +64,26 @@ export class ForumNewPage implements OnInit, OnDestroy, AfterViewInit {
     private toastCtrl: ToastController,
     private alertCtrl: AlertController,
     private route: ActivatedRoute,
-    private router: Router) { }
-
-  ngOnDestroy () {
-    console.log('ngOnDestroy rob');
-  }
-
-  ngAfterViewInit () {
-    console.log('ngAfterViewInit rob');
-  }
+    private router: Router) {
+    }
 
   ngOnInit() {
-    const that = this;
     console.log('ngOnInit rob');
-
-  }
-
-  // https://edupala.com/ionic-loading-example/
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad rob');
   }
 
   ionViewWillEnter() {
+    const that = this;
+
     console.log('ionViewWillEnter rob');
-  }
 
-  ionViewDidEnter () {
-    console.log('ionViewDidEnter rob');
-  }
-
-  ionViewDidLeave() {
-    console.log('ionViewDidLeave rob');
-  }
-
-  ionViewWillUnload(){
-    console.log('ionViewWillUnload rob');
+    this.route.queryParams.subscribe((params: Params) => {
+      if (params['serviceId']){
+        console.log('params ' + params['serviceId']);
+      }
+      else {
+        console.log('no serviceId param');
+      }
+    });
   }
 
   ionViewWillLeave (){
