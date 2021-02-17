@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore } from '@angular/fire/firestore';
-import * as firebase from 'firebase/app';
 import { Observable, from, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { NavController } from '@ionic/angular';
 import {
   User
 } from '../models';
+
+import firebase from 'firebase/app';
 
 @Injectable({
   providedIn: 'root'
@@ -61,8 +62,8 @@ export class AuthService {
         receiveServiceAlertNotifications: false,
         receiveForumPostNotifications: false,
         receiveAlphaNotification: false,
-        creationDate: firebase.default.firestore.FieldValue.serverTimestamp(),
-        lastUpdateDate: firebase.default.firestore.FieldValue.serverTimestamp()
+        creationDate: firebase.firestore.FieldValue.serverTimestamp(),
+        lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp()
       };
       return this.db.doc(`users/${result.user.uid}`).set(data);
     });

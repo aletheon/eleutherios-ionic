@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireDatabase } from '@angular/fire/database';
 
-import * as firebase from 'firebase/app';
 import { Observable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { Registrant } from '../models';
+
+import firebase from 'firebase/app';
 
 @Injectable({
   providedIn: 'root'
@@ -114,7 +115,7 @@ export class UserForumRegistrantService {
 
   public update(parentUserId: string, forumId: string, registrantId: string, data: any){
     const registrantRef = this.afs.collection(`users/${parentUserId}/forums/${forumId}/registrants`).doc(registrantId);
-    data.lastUpdateDate = firebase.default.firestore.FieldValue.serverTimestamp();
+    data.lastUpdateDate = firebase.firestore.FieldValue.serverTimestamp();
     return registrantRef.update(data);
   }
 

@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireDatabase } from '@angular/fire/database';
-
-import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+
+import firebase from 'firebase/app';
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +30,7 @@ export class UserServiceReviewService {
 
   public update(parentUserId: string, parentServiceId: string, data: any) {
     const userServiceReviewRef = this.afs.collection(`users/${parentUserId}/services/${parentServiceId}/servicereviews`).doc(data.serviceReviewId);
-    data.lastUpdateDate = firebase.default.firestore.FieldValue.serverTimestamp();
+    data.lastUpdateDate = firebase.firestore.FieldValue.serverTimestamp();
     return userServiceReviewRef.update(data);
   }
 

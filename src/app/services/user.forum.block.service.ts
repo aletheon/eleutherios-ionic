@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
-
-import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs';
+
+import firebase from 'firebase/app';
 
 // PRIVATE WHEN BLOCKING
 
@@ -81,7 +81,7 @@ export class UserForumBlockService {
 
   public update (parentUserId: string, forumBlockId: string, data: any){
     const forumBlockRef = this.afs.collection(`users/${parentUserId}/forumblocks`).doc(forumBlockId);
-    data.lastUpdateDate = firebase.default.firestore.FieldValue.serverTimestamp();
+    data.lastUpdateDate = firebase.firestore.FieldValue.serverTimestamp();
     return forumBlockRef.update(data);
   }
 

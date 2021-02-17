@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireDatabase } from '@angular/fire/database';
 
-import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Registrant, Forum } from '../models';
+
+import firebase from 'firebase/app';
 
 @Injectable({
   providedIn: 'root'
@@ -53,7 +54,7 @@ export class UserForumService {
 
   public update (parentUserId: string, forumId: string, data: any) {
     const forumRef = this.afs.collection(`users/${parentUserId}/forums`).doc(forumId);
-    data.lastUpdateDate = firebase.default.firestore.FieldValue.serverTimestamp();
+    data.lastUpdateDate = firebase.firestore.FieldValue.serverTimestamp();
     return forumRef.update(data);
   }
 

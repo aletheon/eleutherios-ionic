@@ -4,7 +4,8 @@ import { AngularFireDatabase } from '@angular/fire/database';
 import { Upload } from '../classes/upload';
 import { Image } from '../models';
 
-import * as firebase from 'firebase/app';
+import firebase from 'firebase/app';
+
 import { Observable, of, from } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import * as _ from "lodash";
@@ -63,12 +64,12 @@ export class UserImageService {
   }
 
   public create (parentUserId: string, upload: Upload) {
-    let storageRef = firebase.default.storage().ref();
+    let storageRef = firebase.storage().ref();
     let id = this.afs.createId();
     let storageFilePath: string = `users/${parentUserId}/${id}_${upload.file.name}`;
     let uploadTask = storageRef.child(storageFilePath).put(upload.file);
 
-    uploadTask.on(firebase.default.storage.TaskEvent.STATE_CHANGED,
+    uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,
       (snapshot) =>  {
         // upload in progress
         upload.progress = (uploadTask.snapshot.bytesTransferred / uploadTask.snapshot.totalBytes) * 100
@@ -90,8 +91,8 @@ export class UserImageService {
           mediumUrl: `users/${parentUserId}/medium_${id}.jpg`,
           largeUrl: `users/${parentUserId}/large_${id}.jpg`,
           default: false,
-          lastUpdateDate: firebase.default.firestore.FieldValue.serverTimestamp(),
-          creationDate: firebase.default.firestore.FieldValue.serverTimestamp()
+          lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
+          creationDate: firebase.firestore.FieldValue.serverTimestamp()
         };
 
         this.createUserImage(parentUserId, image).then(() => {
@@ -106,7 +107,7 @@ export class UserImageService {
 
   public update (parentUserId: string, imageId: string, data: any) {
     const imageRef = this.afs.collection(`users/${parentUserId}/images`).doc(imageId);
-    data.lastUpdateDate = firebase.default.firestore.FieldValue.serverTimestamp();
+    data.lastUpdateDate = firebase.firestore.FieldValue.serverTimestamp();
     return imageRef.update(data);
   }
 
@@ -124,7 +125,7 @@ export class UserImageService {
   }
 
   public getDownloadUrl (fileName): Observable<any> {
-    let fileRef = firebase.default.storage().ref(fileName);
+    let fileRef = firebase.storage().ref(fileName);
 
     return from(fileRef.getDownloadURL()).pipe(
       mergeMap(url => {

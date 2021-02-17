@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { TagService } from './tag.service';
-
-import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs';
+
+import firebase from 'firebase/app';
 
 @Injectable({
   providedIn: 'root'
@@ -52,7 +52,7 @@ export class UserTagService {
 
   public update (parentUserId: string, tagId: string, data: any) {
     const tagRef = this.afs.collection(`users/${parentUserId}/tags`).doc(tagId);
-    data.lastUpdateDate = firebase.default.firestore.FieldValue.serverTimestamp();
+    data.lastUpdateDate = firebase.firestore.FieldValue.serverTimestamp();
     return tagRef.update(data);
   }
 

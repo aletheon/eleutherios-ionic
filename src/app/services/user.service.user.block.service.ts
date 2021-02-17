@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
-
-import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs';
+
+import firebase from 'firebase/app';
 
 @Injectable({
   providedIn: 'root'
@@ -48,7 +48,7 @@ export class UserServiceUserBlockService {
   public update(parentUserId: string, forumId: string, userId: string, data: any): Promise<void> {
     return new Promise((resolve, reject) => {
       const serviceUserBlockRef = this.afs.firestore.collection(`users/${parentUserId}/serviceuserblocks`).where("forumId", "==", forumId).where("userId", "==", userId);
-      data.lastUpdateDate = firebase.default.firestore.FieldValue.serverTimestamp();
+      data.lastUpdateDate = firebase.firestore.FieldValue.serverTimestamp();
 
       serviceUserBlockRef.get().then(querySnapshot => {
         if (querySnapshot.size == 0){

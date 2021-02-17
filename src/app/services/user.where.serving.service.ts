@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
-
-import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs';
+
+import firebase from 'firebase/app';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +21,7 @@ export class UserWhereServingService {
     return new Promise((resolve, reject) => {
       let whereServing = {
         forumId: forumId,
-        creationDate: firebase.default.firestore.FieldValue.serverTimestamp()
+        creationDate: firebase.firestore.FieldValue.serverTimestamp()
       };
 
       this.afs.firestore.collection(`users/${parentUserId}/services/${serviceId}/whereservings`).doc(forumId).set(whereServing).then(() => {

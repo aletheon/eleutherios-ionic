@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 
-import * as firebase from 'firebase/app';
 import { BehaviorSubject } from 'rxjs'
 import { User } from '../models'
 
+import firebase from 'firebase/app';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PushMessageService {
 
-  messaging = firebase.default.messaging();
+  messaging = firebase.messaging();
   currentMessage = new BehaviorSubject(null);
 
   constructor(private afs: AngularFirestore) { }
@@ -20,7 +20,7 @@ export class PushMessageService {
   // public methods
   // *********************************************************************
   public getPermission(userId?: string){
-    this.messaging.requestPermission()
+    Notification.requestPermission()
       .then(() => {
         return this.messaging.getToken();
       })

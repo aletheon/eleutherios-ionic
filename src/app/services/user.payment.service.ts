@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireFunctions } from '@angular/fire/functions';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-
-import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs';
+
+import firebase from 'firebase/app';
 
 @Injectable({
   providedIn: 'root'
@@ -59,7 +59,7 @@ export class UserPaymentService {
 
   public update (parentUserId: string, paymentId: string, data: any) {
     const paymentRef = this.afs.collection(`users/${parentUserId}/payments`).doc(paymentId);
-    data.lastUpdateDate = firebase.default.firestore.FieldValue.serverTimestamp();
+    data.lastUpdateDate = firebase.firestore.FieldValue.serverTimestamp();
     return paymentRef.update(data);
   }
 

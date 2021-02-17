@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireFunctions } from '@angular/fire/functions';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-
-import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs';
+
+import firebase from 'firebase/app';
 
 @Injectable({
   providedIn: 'root'
@@ -59,7 +59,7 @@ export class UserReceiptService {
 
   public update (parentUserId: string, receiptId: string, data: any) {
     const receiptRef = this.afs.collection(`users/${parentUserId}/receipts`).doc(receiptId);
-    data.lastUpdateDate = firebase.default.firestore.FieldValue.serverTimestamp();
+    data.lastUpdateDate = firebase.firestore.FieldValue.serverTimestamp();
     return receiptRef.update(data);
   }
 

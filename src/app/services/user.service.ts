@@ -3,9 +3,9 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireFunctions } from '@angular/fire/functions';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { User } from '../models/user.model';
-
-import * as firebase from 'firebase/app';
 import { Observable, from } from 'rxjs';
+
+import firebase from 'firebase/app';
 
 @Injectable({
   providedIn: 'root'
@@ -48,7 +48,7 @@ export class UserService {
     return new Promise((resolve, reject) => {
       this.afs.collection('users').doc(parentUserId).ref.get().then(doc => {
         if (doc.exists){
-          data.lastUpdateDate = firebase.default.firestore.FieldValue.serverTimestamp();
+          data.lastUpdateDate = firebase.firestore.FieldValue.serverTimestamp();
           doc.ref.update(data).then(() => {
             resolve();
           })
@@ -80,7 +80,7 @@ export class UserService {
     return new Promise((resolve, reject) => {
       const url = 'https://us-central1-eleutherios-website.cloudfunctions.net/stripe/onboard-user';
 
-      firebase.default.auth().currentUser.getIdToken()
+      firebase.auth().currentUser.getIdToken()
         .then(authToken => {
           const headers = new HttpHeaders({'Authorization': 'Bearer ' + authToken });
           return this.http.post(url, { uid: parentUserId, returnUrl: returnUrl }, { headers: headers }).toPromise();

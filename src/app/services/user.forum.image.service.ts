@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
-
-import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs';
+
+import firebase from 'firebase/app';
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +33,7 @@ export class UserForumImageService {
     // We should be using the forumImage object creationDate
     // Instead of overwriting it with the creationDate of the image object.
     // *************************************************************************
-    data.creationDate = firebase.default.firestore.FieldValue.serverTimestamp();
+    data.creationDate = firebase.firestore.FieldValue.serverTimestamp();
 
     userForumImageRef.set(data);
     return userForumImageRef.valueChanges();
@@ -41,7 +41,7 @@ export class UserForumImageService {
 
   public update (parentUserId: string, forumId: string, imageId: string, data: any) {
     const userForumImageRef = this.afs.collection(`users/${parentUserId}/forums/${forumId}/images`).doc(imageId);
-    data.lastUpdateDate = firebase.default.firestore.FieldValue.serverTimestamp();
+    data.lastUpdateDate = firebase.firestore.FieldValue.serverTimestamp();
     return userForumImageRef.update(data);
   }
 
