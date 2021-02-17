@@ -1,11 +1,10 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
-    <!-- <ion-buttons slot="end">
-      <ion-back-button></ion-back-button>
-    </ion-buttons> -->
     <ion-title>Create Forum</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
+  <loading-spinner *ngIf="loading | async"></loading-spinner>
+
 </ion-content>
