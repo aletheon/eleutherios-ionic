@@ -5,6 +5,33 @@
 </ion-header>
 
 <ion-content>
-  <loading-spinner *ngIf="loading | async"></loading-spinner>
+  <!-- (ngSubmit)="createProduct()" -->
+  <form [formGroup]="forumGroup">
+
+    <!-- <div class="product-image ion-text-center">
+      <img [src]="productImageBase64" *ngIf="productImageBase64">
+      <ion-button type="button" expand="full" fill="clear" (click)="selectImage()">
+        Select product image
+      </ion-button>
+    </div> -->
+
+    <ion-item>
+        <ion-label position="stacked">Title</ion-label>
+        <ion-input formControlName="title"></ion-input>
+    </ion-item>
+    <ion-item>
+        <ion-label position="stacked">Price</ion-label>
+        <ion-input formControlName="price"></ion-input>
+    </ion-item>
+    <ion-item>
+        <ion-label position="stacked">Description</ion-label>
+        <ion-textarea rows="6" formControlName="desc"></ion-textarea>
+    </ion-item>
+
+    <!-- <ion-button type="submit" expand="block" class="ion-padding-horizontal ion-margin-vertical"
+    [disabled]="!productForm.valid">
+      Save Product
+    </ion-button> -->
+  </form>
 
 </ion-content>

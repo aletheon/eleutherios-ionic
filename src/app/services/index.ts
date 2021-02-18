@@ -1,4 +1,5 @@
 // private
+export * from './auth.service';
 export * from './user.service';
 export * from './user.tag.service';
 export * from './user.forum.block.service';

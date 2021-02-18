@@ -8,7 +8,6 @@ import { ForumNewPageRoutingModule } from './forum-new-routing.module';
 
 import { ForumNewPage } from './forum-new.page';
 import { MomentModule } from 'angular2-moment';
-import { LoadingSpinnerModule } from '../../components';
 
 @NgModule({
   imports: [
@@ -17,8 +16,7 @@ import { LoadingSpinnerModule } from '../../components';
     IonicModule,
     ForumNewPageRoutingModule,
     ReactiveFormsModule,
-    MomentModule,
-    LoadingSpinnerModule
+    MomentModule
   ],
   declarations: [ForumNewPage]
 })

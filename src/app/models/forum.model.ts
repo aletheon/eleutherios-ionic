@@ -9,10 +9,9 @@ export interface Forum {
   description: string, // description of the forum
   website: string, // website of the forum
   indexed: boolean, // whether this service is indexed or hidden
-  // status: string, // [complete, incomplete, processed, pending, etc]
   includeDescriptionInDetailPage: boolean,
   includeImagesInDetailPage: boolean,
   includeTagsInDetailPage: boolean,
-  lastUpdateDate: object, 
-  creationDate: object 
+  lastUpdateDate: object,
+  creationDate: object
 }

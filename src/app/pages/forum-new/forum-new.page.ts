@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
-import { LoadingController, ToastController, AlertController } from '@ionic/angular';
+import { LoadingController, ToastController, AlertController, IonInput } from '@ionic/angular';
 import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { Observable, Subscription, BehaviorSubject, of, from, combineLatest, zip, timer, defer, throwError } from 'rxjs';
+import firebase from 'firebase/app';
 
 // https://edupala.com/ionic-loading-example/
 // ionViewDidEnter
@@ -14,6 +14,7 @@ import { Observable, Subscription, BehaviorSubject, of, from, combineLatest, zip
 
 import * as _ from "lodash";
 import {
+  AuthService,
   SiteTotalService,
   UserServiceService,
   UserActivityService,
@@ -33,14 +34,20 @@ import {
   UserImageService,
   UserServiceTagService
 } from '../../services';
+import {
+  Forum
+} from '../../models';
 
 @Component({
   selector: 'app-forum-new',
   templateUrl: './forum-new.page.html',
   styleUrls: ['./forum-new.page.scss'],
 })
-export class ForumNewPage implements OnInit {
-  @ViewChild('main-title', { static: false }) titleRef: ElementRef;
+export class ForumNewPage implements OnInit, OnDestroy {
+  public forumGroup: FormGroup;
+  public searchPrivateServices: boolean = false;
+  public searchServiceIncludeTagsInSearch: boolean = false;
+  public loading: HTMLIonLoadingElement;
 
   constructor(private fb: FormBuilder,
     private authService: AuthService,
@@ -65,29 +72,60 @@ export class ForumNewPage implements OnInit {
     private alertCtrl: AlertController,
     private route: ActivatedRoute,
     private router: Router) {
-    }
-
-  ngOnInit() {
-    console.log('ngOnInit rob');
   }
 
-  ionViewWillEnter() {
-    const that = this;
+  ngOnDestroy () {
+  }
 
-    console.log('ionViewWillEnter rob');
+  async ngOnInit() {
+    this.forumGroup = this.fb.group({
+      title: ['', Validators.required],
+      price: ['', Validators.required],
+      desc: ['', Validators.required],
+      img: ''
+    })
 
-    this.route.queryParams.subscribe((params: Params) => {
+    this.loading = await this.loadingController.create({
+      message: 'Loading...'
+    });
+    await this.loading.present();
+
+    this.searchPrivateServices = true;
+    this.searchServiceIncludeTagsInSearch = true;
+    const forum: Forum = {
+      forumId: '',
+      parentId: '',
+      parentUid: '',
+      uid: this.authService.uid,
+      type: 'Private',
+      title: '',
+      title_lowercase: '',
+      description: '',
+      website: '',
+      indexed: false,
+      includeDescriptionInDetailPage: false,
+      includeImagesInDetailPage: false,
+      includeTagsInDetailPage: false,
+      lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
+      creationDate: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    this.route.queryParams.subscribe(async (params: Params) => {
       if (params['serviceId']){
         console.log('params ' + params['serviceId']);
       }
       else {
         console.log('no serviceId param');
       }
+      await this.loading.dismiss();
     });
   }
 
-  ionViewWillLeave (){
-    console.log('ionViewWillLeave rob');
-  }
+  // ionViewWillEnter() {
+  //   console.log('ionViewWillEnter rob');
+  // }
 
+  // ionViewWillLeave (){
+  //   console.log('ionViewWillLeave rob');
+  // }
 }
