@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
+import { IonicSelectableModule } from 'ionic-selectable';
 
 import { ForumNewPageRoutingModule } from './forum-new-routing.module';
 
@@ -16,7 +17,8 @@ import { MomentModule } from 'angular2-moment';
     IonicModule,
     ForumNewPageRoutingModule,
     ReactiveFormsModule,
-    MomentModule
+    MomentModule,
+    IonicSelectableModule
   ],
   declarations: [ForumNewPage]
 })

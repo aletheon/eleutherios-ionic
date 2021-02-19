@@ -3,6 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
+import { IonicSelectableModule } from 'ionic-selectable';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 
@@ -15,6 +16,7 @@ import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireStorageModule } from '@angular/fire/storage';
 import { AngularFireAuthGuardModule } from '@angular/fire/auth-guard';
 import { environment } from './../environments/environment';
+import { MomentModule } from 'angular2-moment';
 
 import { Camera } from '@ionic-native/camera/ngx';
 
@@ -34,7 +36,9 @@ class CameraMock extends Camera {
     AngularFireAuthModule,
     AngularFirestoreModule,
     AngularFireStorageModule,
-    AngularFireAuthGuardModule
+    AngularFireAuthGuardModule,
+    IonicSelectableModule,
+    MomentModule
   ],
   providers: [
     StatusBar,

@@ -7,6 +7,11 @@ import { Router } from '@angular/router';
 import { Observable, Subscription, BehaviorSubject, of, from, combineLatest, zip, timer, defer, throwError } from 'rxjs';
 import firebase from 'firebase/app';
 
+class Tag {
+  public id: number;
+  public name: string;
+}
+
 // https://edupala.com/ionic-loading-example/
 // ionViewDidEnter
 // ionViewDidLeave
@@ -37,6 +42,7 @@ import {
 import {
   Forum
 } from '../../models';
+import { IonicSelectableComponent } from 'ionic-selectable';
 
 @Component({
   selector: 'app-forum-new',
@@ -44,10 +50,15 @@ import {
   styleUrls: ['./forum-new.page.scss'],
 })
 export class ForumNewPage implements OnInit, OnDestroy {
+  @ViewChild('mainTitle', { static: false }) titleRef: IonInput;
+
   public forumGroup: FormGroup;
   public searchPrivateServices: boolean = false;
   public searchServiceIncludeTagsInSearch: boolean = false;
   public loading: HTMLIonLoadingElement;
+
+  public tags: Tag[];
+  public tag: Tag;
 
   constructor(private fb: FormBuilder,
     private authService: AuthService,
@@ -72,60 +83,142 @@ export class ForumNewPage implements OnInit, OnDestroy {
     private alertCtrl: AlertController,
     private route: ActivatedRoute,
     private router: Router) {
+      this.tags = [
+        { id: 1, name: 'Apple' },
+        { id: 2, name: 'Banana' },
+        { id: 3, name: 'Orange' }
+      ];
   }
 
-  ngOnDestroy () {
+  async tagChange(event: {
+    component: IonicSelectableComponent,
+    value: any
+  }) {
+    console.log('port:', event.value);
+  }
+
+  async ngOnDestroy () {
   }
 
   async ngOnInit() {
+    this.searchPrivateServices = true;
+    this.searchServiceIncludeTagsInSearch = true;
+
+    // this.forumGroup = this.fb.group({
+    //   title: ['',[Validators.required, Validators.pattern(/^[A-Za-z0-9._\s]*$/)]],
+    //   price: ['', Validators.required],
+    //   desc: ['', Validators.required],
+    //   img: ''
+    // })
+
     this.forumGroup = this.fb.group({
-      title: ['', Validators.required],
-      price: ['', Validators.required],
-      desc: ['', Validators.required],
-      img: ''
-    })
+      forumId:                            [''],
+      parentId:                           [''],
+      parentUid:                          [''],
+      uid:                                [''],
+      type:                               [''],
+      title:                              ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9._\s]*$/)]],
+      title_lowercase:                    [''],
+      description:                        [''],
+      website:                            [''],
+      indexed:                            [''],
+      includeDescriptionInDetailPage:     [''],
+      includeImagesInDetailPage:          [''],
+      includeTagsInDetailPage:            [''],
+      searchPaymentType:                  [''],
+      searchCurrency:                     [''],
+      tag:                                [''],
+      searchStartAmount:                  ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0), Validators.max(999999.99)]],
+      searchEndAmount:                    ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0), Validators.max(999999.99)]],
+      searchPrivateServices:              [''],
+      searchServiceIncludeTagsInSearch:   [''],
+      lastUpdateDate:                     [''],
+      creationDate:                       ['']
+    });
+    // this.forumGroup.get('searchPaymentType').setValue('Any');
+    // this.forumGroup.get('searchCurrency').setValue('NZD');
+    // this.forumGroup.get('searchStartAmount').setValue(1);
+    // this.forumGroup.get('searchEndAmount').setValue(10);
+    // this.forumGroup.get('type').setValue('Private');
+    // this.forumGroup.get('indexed').setValue(false);
+    // this.forumGroup.get('searchPrivateServices').setValue(this.searchPrivateServices);
+    // this.forumGroup.get('searchServiceIncludeTagsInSearch').setValue(this.searchServiceIncludeTagsInSearch);
 
     this.loading = await this.loadingController.create({
       message: 'Loading...'
     });
     await this.loading.present();
 
-    this.searchPrivateServices = true;
-    this.searchServiceIncludeTagsInSearch = true;
-    const forum: Forum = {
-      forumId: '',
-      parentId: '',
-      parentUid: '',
-      uid: this.authService.uid,
-      type: 'Private',
-      title: '',
-      title_lowercase: '',
-      description: '',
-      website: '',
-      indexed: false,
-      includeDescriptionInDetailPage: false,
-      includeImagesInDetailPage: false,
-      includeTagsInDetailPage: false,
-      lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
-      creationDate: firebase.firestore.FieldValue.serverTimestamp()
-    };
+    // const forum: Forum = {
+    //   forumId: '',
+    //   parentId: '',
+    //   parentUid: '',
+    //   uid: this.authService.uid,
+    //   type: 'Private',
+    //   title: '',
+    //   title_lowercase: '',
+    //   description: '',
+    //   website: '',
+    //   indexed: false,
+    //   includeDescriptionInDetailPage: false,
+    //   includeImagesInDetailPage: false,
+    //   includeTagsInDetailPage: false,
+    //   lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
+    //   creationDate: firebase.firestore.FieldValue.serverTimestamp()
+    // };
 
     this.route.queryParams.subscribe(async (params: Params) => {
-      if (params['serviceId']){
-        console.log('params ' + params['serviceId']);
-      }
-      else {
-        console.log('no serviceId param');
-      }
+      // if (params['serviceId']){
+      //   console.log('params ' + params['serviceId']);
+      // }
+      // else {
+      //   console.log('no serviceId param');
+      // }
       await this.loading.dismiss();
     });
   }
 
-  // ionViewWillEnter() {
+  async saveChanges () {
+    if (this.forumGroup.status != 'VALID') {
+      // exclude payment search controls
+      if (!(this.forumGroup.get('searchStartAmount').hasError('pattern') ||
+        this.forumGroup.get('searchStartAmount').hasError('min') ||
+        this.forumGroup.get('searchStartAmount').hasError('max') ||
+        this.forumGroup.get('searchEndAmount').hasError('pattern') ||
+        this.forumGroup.get('searchEndAmount').hasError('min') ||
+        this.forumGroup.get('searchEndAmount').hasError('max') ||
+        this.forumGroup.errors?.range)) {
+          console.log('form is not valid, cannot save to database');
+          setTimeout(() => {
+            for (let i in this.forumGroup.controls) {
+              this.forumGroup.controls[i].markAsTouched();
+            }
+
+            if (this.forumGroup.get('title').hasError('required') || this.forumGroup.get('title').hasError('pattern'))
+              this.titleRef.setFocus();
+          }, 500);
+          return;
+      }
+    }
+  }
+
+  async reset(){
+    this.forumGroup.reset();
+    this.forumGroup.get('indexed').setValue(false);
+    this.forumGroup.get('type').setValue('Private');
+    this.forumGroup.get('searchPaymentType').setValue('Any');
+    this.forumGroup.get('searchCurrency').setValue('NZD');
+    this.forumGroup.get('searchStartAmount').setValue(1);
+    this.forumGroup.get('searchEndAmount').setValue(10);
+    this.forumGroup.get('searchPrivateServices').setValue(this.searchPrivateServices);
+    this.forumGroup.get('searchServiceIncludeTagsInSearch').setValue(this.searchServiceIncludeTagsInSearch);
+  }
+
+  // async ionViewWillEnter() {
   //   console.log('ionViewWillEnter rob');
   // }
 
-  // ionViewWillLeave (){
+  // async ionViewWillLeave (){
   //   console.log('ionViewWillLeave rob');
   // }
 }
