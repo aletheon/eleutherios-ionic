@@ -5,17 +5,8 @@ import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms'
 import { Router } from '@angular/router';
 
 import { Observable, Subscription, BehaviorSubject, of, from, combineLatest, zip, timer, defer, throwError } from 'rxjs';
+import { IonicSelectableComponent } from 'ionic-selectable';
 import firebase from 'firebase/app';
-
-class Tag {
-  public id: number;
-  public name: string;
-}
-
-// https://edupala.com/ionic-loading-example/
-// ionViewDidEnter
-// ionViewDidLeave
-// ionViewWillUnload
 
 import * as _ from "lodash";
 import {
@@ -40,9 +31,10 @@ import {
   UserServiceTagService
 } from '../../services';
 import {
-  Forum
+  Forum,
+  Tag
 } from '../../models';
-import { IonicSelectableComponent } from 'ionic-selectable';
+import { stringify } from '@angular/compiler/src/util';
 
 @Component({
   selector: 'app-forum-new',
@@ -52,13 +44,76 @@ import { IonicSelectableComponent } from 'ionic-selectable';
 export class ForumNewPage implements OnInit, OnDestroy {
   @ViewChild('mainTitle', { static: false }) titleRef: IonInput;
 
+  private _searchTagsSubscription: Subscription;
+  private _selectedTags: Tag[];
+
   public forumGroup: FormGroup;
   public searchPrivateServices: boolean = false;
   public searchServiceIncludeTagsInSearch: boolean = false;
   public loading: HTMLIonLoadingElement;
 
-  public tags: Tag[];
-  public tag: Tag;
+
+  // do this rob
+  /// https://stackblitz.com/edit/ionic-selectable-adding-on-search-fail?file=app/pages/home/home.html
+
+
+
+
+  filterTags(tags: Tag[], text: string) {
+    return tags.filter(tag => {
+      return tag.tag.toLowerCase().indexOf(text) !== -1 ||
+        tag.tagId.toString().toLowerCase().indexOf(text) !== -1;
+    });
+  }
+
+  tagChanged(event: {
+    component: IonicSelectableComponent,
+    value: any
+  }) {
+    this._selectedTags = event.value;
+
+    let output: string = '';
+
+    // Use of _.forEach() method
+    _.forEach(this._selectedTags, function(value) {
+      output += value.tag + ',';
+    });
+
+    console.log(output.substring(0, output.length-1));
+  }
+
+  searchTags(event: {
+    component: IonicSelectableComponent,
+    text: string
+  }) {
+    let text = event.text.trim().toLowerCase();
+    event.component.startSearch();
+
+    // Close any running subscription.
+    if (this._searchTagsSubscription) {
+      this._searchTagsSubscription.unsubscribe();
+    }
+
+    if (!text) {
+      // Close any running subscription.
+      if (this._searchTagsSubscription) {
+        this._searchTagsSubscription.unsubscribe();
+      }
+
+      event.component.items = [];
+      event.component.endSearch();
+      return;
+    }
+
+    this._searchTagsSubscription = this.tagService.search(text).subscribe(tags => {
+      // Subscription will be closed when unsubscribed manually.
+      if (this._searchTagsSubscription.closed) {
+        return;
+      }
+      event.component.items = this.filterTags(tags, text);
+      event.component.endSearch();
+    });
+  }
 
   constructor(private fb: FormBuilder,
     private authService: AuthService,
@@ -74,6 +129,7 @@ export class ForumNewPage implements OnInit, OnDestroy {
     private userForumUserBlockService: UserForumUserBlockService,
     private userForumRegistrantService: UserForumRegistrantService,
     private userTagService: UserTagService,
+    private tagService: TagService,
     private serviceService: ServiceService,
     private userForumService: UserForumService,
     private userImageService: UserImageService,
@@ -83,18 +139,6 @@ export class ForumNewPage implements OnInit, OnDestroy {
     private alertCtrl: AlertController,
     private route: ActivatedRoute,
     private router: Router) {
-      this.tags = [
-        { id: 1, name: 'Apple' },
-        { id: 2, name: 'Banana' },
-        { id: 3, name: 'Orange' }
-      ];
-  }
-
-  async tagChange(event: {
-    component: IonicSelectableComponent,
-    value: any
-  }) {
-    console.log('port:', event.value);
   }
 
   async ngOnDestroy () {
@@ -135,14 +179,14 @@ export class ForumNewPage implements OnInit, OnDestroy {
       lastUpdateDate:                     [''],
       creationDate:                       ['']
     });
-    // this.forumGroup.get('searchPaymentType').setValue('Any');
-    // this.forumGroup.get('searchCurrency').setValue('NZD');
-    // this.forumGroup.get('searchStartAmount').setValue(1);
-    // this.forumGroup.get('searchEndAmount').setValue(10);
-    // this.forumGroup.get('type').setValue('Private');
-    // this.forumGroup.get('indexed').setValue(false);
-    // this.forumGroup.get('searchPrivateServices').setValue(this.searchPrivateServices);
-    // this.forumGroup.get('searchServiceIncludeTagsInSearch').setValue(this.searchServiceIncludeTagsInSearch);
+    this.forumGroup.get('searchPaymentType').setValue('Any');
+    this.forumGroup.get('searchCurrency').setValue('NZD');
+    this.forumGroup.get('searchStartAmount').setValue(1);
+    this.forumGroup.get('searchEndAmount').setValue(10);
+    this.forumGroup.get('type').setValue('Private');
+    this.forumGroup.get('indexed').setValue(false);
+    this.forumGroup.get('searchPrivateServices').setValue(this.searchPrivateServices);
+    this.forumGroup.get('searchServiceIncludeTagsInSearch').setValue(this.searchServiceIncludeTagsInSearch);
 
     this.loading = await this.loadingController.create({
       message: 'Loading...'
@@ -213,12 +257,4 @@ export class ForumNewPage implements OnInit, OnDestroy {
     this.forumGroup.get('searchPrivateServices').setValue(this.searchPrivateServices);
     this.forumGroup.get('searchServiceIncludeTagsInSearch').setValue(this.searchServiceIncludeTagsInSearch);
   }
-
-  // async ionViewWillEnter() {
-  //   console.log('ionViewWillEnter rob');
-  // }
-
-  // async ionViewWillLeave (){
-  //   console.log('ionViewWillLeave rob');
-  // }
 }

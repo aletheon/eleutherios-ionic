@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 import { IonicSelectableModule } from 'ionic-selectable';
+import { AutoCompleteModule } from 'ionic4-auto-complete';
 
 import { ForumNewPageRoutingModule } from './forum-new-routing.module';
 
@@ -18,7 +19,8 @@ import { MomentModule } from 'angular2-moment';
     ForumNewPageRoutingModule,
     ReactiveFormsModule,
     MomentModule,
-    IonicSelectableModule
+    IonicSelectableModule,
+    AutoCompleteModule
   ],
   declarations: [ForumNewPage]
 })

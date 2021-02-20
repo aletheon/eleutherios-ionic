@@ -6,13 +6,6 @@
 
 <ion-content>
   <form [formGroup]="forumGroup" (ngSubmit)="saveChanges()">
-
-    <!-- <div class="product-image ion-text-center">
-      <img [src]="productImageBase64" *ngIf="productImageBase64">
-      <ion-button type="button" expand="full" fill="clear" (click)="selectImage()">
-        Select product image
-      </ion-button>
-    </div> -->
     <ion-item lines="none">
       <ion-label>Active</ion-label>
       <ion-toggle formControlName="indexed"></ion-toggle>
@@ -40,13 +33,19 @@
     <ion-item>
       <ion-label position="stacked">Tags</ion-label>
       <ionic-selectable
+        #tagComponent
         formControlName="tag"
         [items]="tags"
-        itemValueField="id"
-        itemTextField="name"
+        itemValueField="tagId"
+        itemTextField="tag"
         [canSearch]="true"
-        (onChange)="tagChange($event)"
-        [isMultiple]="true">
+        (onSearch)="searchTags($event)"
+        (onChange)="tagChanged($event)"
+        [isMultiple]="true"
+        [isConfirmButtonEnabled]="tagComponent.itemsToConfirm.length >= 1 && tagComponent.itemsToConfirm.length <= 3">
+        <ng-template ionicSelectableMessageTemplate>
+					Select between 1 to 3 items.
+				</ng-template>
       </ionic-selectable>
     </ion-item>
     <ion-button type="submit" expand="block" class="ion-padding-horizontal ion-margin-vertical" [disabled]="!forumGroup.valid">
