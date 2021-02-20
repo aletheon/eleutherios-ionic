@@ -52,12 +52,31 @@ export class ForumNewPage implements OnInit, OnDestroy {
   public searchServiceIncludeTagsInSearch: boolean = false;
   public loading: HTMLIonLoadingElement;
 
-
-  // do this rob
-  /// https://stackblitz.com/edit/ionic-selectable-adding-on-search-fail?file=app/pages/home/home.html
-
-
-
+  constructor(private fb: FormBuilder,
+    private authService: AuthService,
+    private siteTotalService: SiteTotalService,
+    private userActivityService: UserActivityService,
+    private userForumTagService: UserForumTagService,
+    private userForumImageService: UserForumImageService,
+    private userServiceImageService: UserServiceImageService,
+    private userForumServiceBlockService: UserForumServiceBlockService,
+    private userServiceForumBlockService: UserServiceForumBlockService,
+    private userServiceBlockService: UserServiceBlockService,
+    private userServiceUserBlockService: UserServiceUserBlockService,
+    private userForumUserBlockService: UserForumUserBlockService,
+    private userForumRegistrantService: UserForumRegistrantService,
+    private userTagService: UserTagService,
+    private tagService: TagService,
+    private serviceService: ServiceService,
+    private userForumService: UserForumService,
+    private userImageService: UserImageService,
+    private userServiceTagService: UserServiceTagService,
+    private loadingController: LoadingController,
+    private toastCtrl: ToastController,
+    private alertCtrl: AlertController,
+    private route: ActivatedRoute,
+    private router: Router) {
+  }
 
   filterTags(tags: Tag[], text: string) {
     return tags.filter(tag => {
@@ -78,7 +97,6 @@ export class ForumNewPage implements OnInit, OnDestroy {
     _.forEach(this._selectedTags, function(value) {
       output += value.tag + ',';
     });
-
     console.log(output.substring(0, output.length-1));
   }
 
@@ -115,45 +133,12 @@ export class ForumNewPage implements OnInit, OnDestroy {
     });
   }
 
-  constructor(private fb: FormBuilder,
-    private authService: AuthService,
-    private siteTotalService: SiteTotalService,
-    private userActivityService: UserActivityService,
-    private userForumTagService: UserForumTagService,
-    private userForumImageService: UserForumImageService,
-    private userServiceImageService: UserServiceImageService,
-    private userForumServiceBlockService: UserForumServiceBlockService,
-    private userServiceForumBlockService: UserServiceForumBlockService,
-    private userServiceBlockService: UserServiceBlockService,
-    private userServiceUserBlockService: UserServiceUserBlockService,
-    private userForumUserBlockService: UserForumUserBlockService,
-    private userForumRegistrantService: UserForumRegistrantService,
-    private userTagService: UserTagService,
-    private tagService: TagService,
-    private serviceService: ServiceService,
-    private userForumService: UserForumService,
-    private userImageService: UserImageService,
-    private userServiceTagService: UserServiceTagService,
-    private loadingController: LoadingController,
-    private toastCtrl: ToastController,
-    private alertCtrl: AlertController,
-    private route: ActivatedRoute,
-    private router: Router) {
-  }
-
   async ngOnDestroy () {
   }
 
   async ngOnInit() {
     this.searchPrivateServices = true;
     this.searchServiceIncludeTagsInSearch = true;
-
-    // this.forumGroup = this.fb.group({
-    //   title: ['',[Validators.required, Validators.pattern(/^[A-Za-z0-9._\s]*$/)]],
-    //   price: ['', Validators.required],
-    //   desc: ['', Validators.required],
-    //   img: ''
-    // })
 
     this.forumGroup = this.fb.group({
       forumId:                            [''],
@@ -172,6 +157,7 @@ export class ForumNewPage implements OnInit, OnDestroy {
       searchPaymentType:                  [''],
       searchCurrency:                     [''],
       tag:                                [''],
+      newTagName:                         [''],
       searchStartAmount:                  ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0), Validators.max(999999.99)]],
       searchEndAmount:                    ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0), Validators.max(999999.99)]],
       searchPrivateServices:              [''],

@@ -39,6 +39,7 @@
         itemValueField="tagId"
         itemTextField="tag"
         [canSearch]="true"
+        [canClear]="true"
         (onSearch)="searchTags($event)"
         (onChange)="tagChanged($event)"
         [isMultiple]="true"
