@@ -28,8 +28,13 @@
               </ion-button>
             </ion-buttons>
           </ion-item>
-          <ion-item [routerLink]="['/menu/tabs/tag-list']" routerDirection="root">
-            <ion-label>Tags(0)</ion-label>
+          <ion-item>
+            <ion-label [routerLink]="['/menu/tabs/tag-list']" routerDirection="root">Tags(0)</ion-label>
+            <ion-buttons slot="end">
+              <ion-button [routerLink]="['/menu/tabs/tag-new']" routerDirection="root" color="medium">
+                <ion-icon slot="icon-only" name="add-circle"></ion-icon>
+              </ion-button>
+            </ion-buttons>
           </ion-item>
           <ion-item [routerLink]="['/menu/tabs/block-list']" routerDirection="root">
             <ion-label>Blocks(0)</ion-label>
