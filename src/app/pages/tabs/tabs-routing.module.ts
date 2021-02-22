@@ -49,6 +49,10 @@ const routes: Routes = [
         loadChildren: () => import('../service-list-details/service-list-details.module').then( m => m.ServiceListDetailsPageModule)
       },
       {
+        path: 'tag-new',
+        loadChildren: () => import('../tag-new/tag-new.module').then( m => m.TagNewPageModule)
+      },
+      {
         path: 'tag-list',
         loadChildren: () => import('../tag-list/tag-list.module').then( m => m.TagListPageModule)
       },
