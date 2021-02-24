@@ -43,11 +43,6 @@ export class TagNewPage implements OnInit {
     });
   }
 
-  async ionViewWillEnter() {
-    console.log('ionViewWillEnter');
-    this.tagGroup.reset();
-  }
-
   saveChanges () {
     if (this.tagGroup.status != 'VALID')
       return;
