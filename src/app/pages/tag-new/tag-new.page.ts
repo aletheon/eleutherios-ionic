@@ -6,7 +6,8 @@ import * as _ from "lodash";
 
 import {
   AuthService,
-  UserTagService
+  UserTagService,
+  TagService
 } from '../../services';
 import {
   Tag
@@ -27,6 +28,7 @@ export class TagNewPage implements OnInit, OnDestroy {
     private auth: AuthService,
     private fb: FormBuilder,
     private userTagService: UserTagService,
+    private tagService: TagService,
     private toastCtrl: ToastController,
     private navCtrl: NavController
   ) {
@@ -49,23 +51,31 @@ export class TagNewPage implements OnInit, OnDestroy {
     if (this.tagGroup.status != 'VALID')
       return;
 
-    // Create tag.
-    let newTag: Tag = {
-      tagId: '',
-      uid: this.auth.uid,
-      tag: this.tagGroup.get('tag').value,
-      lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
-      creationDate: firebase.firestore.FieldValue.serverTimestamp()
-    };
+    this.tagService.exists(this.tagGroup.get('tag').value).then(exists => {
+      if (!exists){
+        // Create tag
+        let newTag: Tag = {
+          tagId: '',
+          uid: this.auth.uid,
+          tag: this.tagGroup.get('tag').value.toLowerCase(),
+          lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
+          creationDate: firebase.firestore.FieldValue.serverTimestamp()
+        };
 
-    // Add tag
-    this.userTagService.create(this.auth.uid, newTag).then(() => {
-      this.showSuccess();
-      this.navCtrl.pop();
+        // Add tag
+        this.userTagService.create(this.auth.uid, newTag).then(() => {
+          this.showSuccess();
+          this.navCtrl.pop();
+        })
+        .catch(error => {
+          console.error(error);
+        });
+      }
+      else this.showError(`Tag with name '${this.tagGroup.get('tag').value}' already exists`);
     })
     .catch(error => {
-      this.showError(error);
-    })
+      console.error(error);
+    });
   }
 
   async showSuccess() {

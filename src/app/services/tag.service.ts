@@ -16,45 +16,22 @@ export class TagService {
   // *********************************************************************
   public exists(tag: string): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-      const tagRef = this.afs.collection('tags').ref.where('tag', '==', tag);
+      const tagRef = this.afs.collection('tags').ref.where('tag', '==', tag.toLowerCase());
 
       tagRef.get().then(snapshot => {
         if (snapshot.size > 0)
           resolve(true);
         else
           resolve(false);
+      })
+      .catch(error => {
+        reject(error);
       });
     });
   }
 
   public getTag(tagId: string): Observable<any> {
     return this.afs.collection('tags').doc(tagId).valueChanges();
-  }
-
-  public create(tagId: string, data: any): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const tagRef = this.afs.collection('tags').doc(tagId);
-
-      tagRef.set(data).then(() => {
-        resolve();
-      })
-      .catch(error => {
-        reject(error);
-      });
-    });
-  }
-
-  public delete(tagId: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const tagRef = this.afs.collection('tags').doc(tagId);
-
-      tagRef.delete().then(() => {
-        resolve();
-      })
-      .catch(error => {
-        reject(error);
-      });
-    });
   }
 
   public search(searchTerm: any): Observable<any[]> {

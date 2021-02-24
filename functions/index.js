@@ -1892,47 +1892,22 @@ exports.createUserTag = functions.firestore.document("users/{userId}/tags/{tagId
     });
   };
 
-  var tagExists = function () {
-    return new Promise((resolve, reject) => {
-      admin.firestore().collection('tags').select()
-        .where('tag', '==', tag.tag)
-        .get().then(tagSnapshot => {
-          if (tagSnapshot.size > 0)
-            resolve(true);
-          else
-            resolve(false);
-        }
-      )
-      .catch(error => {
-        reject(error);
-      });
-    });
-  }
-
-  return tagExists().then(exists => {
-    if (!exists){
-      return admin.firestore().collection(`users/${userId}/tags`).select()
-        .get().then(snapshot => {
-          return admin.database().ref("totals").child(userId).once("value", totalSnapshot => {
-            if (totalSnapshot.exists())
-              return admin.database().ref("totals").child(userId).update({ tagCount: snapshot.size });
-            else
-              return Promise.resolve();
-          });
-        }
-      ).then(() => {
-        return createPublicTag().then(() => {
+  return admin.firestore().collection(`users/${userId}/tags`).select()
+    .get().then(snapshot => {
+      return admin.database().ref("totals").child(userId).once("value", totalSnapshot => {
+        if (totalSnapshot.exists())
+          return admin.database().ref("totals").child(userId).update({ tagCount: snapshot.size });
+        else
           return Promise.resolve();
-        })
-        .catch(error => {
-          return Promise.reject(error);
-        });
-      })
-      .catch(error => {
-        return Promise.reject(error);
       });
     }
-    else return Promise.reject(`The tag with name '${tag.tag}' already exists`);
+  ).then(() => {
+    return createPublicTag().then(() => {
+      return Promise.resolve();
+    })
+    .catch(error => {
+      return Promise.reject(error);
+    });
   })
   .catch(error => {
     return Promise.reject(error);
@@ -1985,7 +1960,7 @@ exports.deleteUserTag = functions.firestore.document("users/{userId}/tags/{tagId
     });
   })
   .catch(error => {
-    reject(error);
+    return Promise.reject(error);
   });
 });
 
