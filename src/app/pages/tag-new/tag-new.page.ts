@@ -28,8 +28,7 @@ export class TagNewPage implements OnInit {
     private userTagService: UserTagService,
     private tagService: TagService,
     private toastCtrl: ToastController,
-    private navCtrl: NavController
-  ) {
+    private navCtrl: NavController) {
   }
 
   async ngOnInit() {
