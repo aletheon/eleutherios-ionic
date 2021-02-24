@@ -10,48 +10,50 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <ion-list>
-        <ion-menu-toggle auto-hide="false">
-          <ion-item>
-            <ion-label [routerLink]="['/menu/tabs/forum-list']" [queryParams]="{ mode: 'private' }" routerDirection="root">Forums(0)</ion-label>
-            <ion-buttons slot="end">
-              <ion-button [routerLink]="['/menu/tabs/forum-new']" routerDirection="root" color="danger">
-                <ion-icon slot="icon-only" name="add-circle"></ion-icon>
-              </ion-button>
-            </ion-buttons>
-          </ion-item>
-          <ion-item>
-            <ion-label [routerLink]="['/menu/tabs/service-list']" [queryParams]="{ mode: 'private' }" routerDirection="root">Services(0)</ion-label>
-            <ion-buttons slot="end">
-              <ion-button [routerLink]="['/menu/tabs/service-new']" routerDirection="root" color="primary">
-                <ion-icon slot="icon-only" name="add-circle"></ion-icon>
-              </ion-button>
-            </ion-buttons>
-          </ion-item>
-          <ion-item>
-            <ion-label [routerLink]="['/menu/tabs/tag-list']" routerDirection="root">Tags(0)</ion-label>
-            <ion-buttons slot="end">
-              <ion-button [routerLink]="['/menu/tabs/tag-new']" routerDirection="root" color="medium">
-                <ion-icon slot="icon-only" name="add-circle"></ion-icon>
-              </ion-button>
-            </ion-buttons>
-          </ion-item>
-          <ion-item [routerLink]="['/menu/tabs/block-list']" routerDirection="root">
-            <ion-label>Blocks(0)</ion-label>
-          </ion-item>
-          <ion-item [routerLink]="['/menu/tabs/payment-list']" routerDirection="root">
-            <ion-label>Payments(0)</ion-label>
-          </ion-item>
-          <ion-item [routerLink]="['/menu/tabs/receipt-list']" routerDirection="root">
-            <ion-label>Receipts(0)</ion-label>
-          </ion-item>
-          <ion-item (click)="signOut()" style="cursor:pointer">
-            <ion-label>
-              Logout
-            </ion-label>
-          </ion-item>
-        </ion-menu-toggle>
-      </ion-list>
+      <ng-container *ngIf="userTotal | async as total">
+        <ion-list>
+          <ion-menu-toggle auto-hide="false">
+            <ion-item>
+              <ion-label [routerLink]="['/menu/tabs/forum-list']" [queryParams]="{ mode: 'private' }" routerDirection="root">Forums({{ total.forumCount }})</ion-label>
+              <ion-buttons slot="end">
+                <ion-button [routerLink]="['/menu/tabs/forum-new']" routerDirection="root" color="danger">
+                  <ion-icon slot="icon-only" name="add-circle"></ion-icon>
+                </ion-button>
+              </ion-buttons>
+            </ion-item>
+            <ion-item>
+              <ion-label [routerLink]="['/menu/tabs/service-list']" [queryParams]="{ mode: 'private' }" routerDirection="root">Services({{ total.serviceCount }})</ion-label>
+              <ion-buttons slot="end">
+                <ion-button [routerLink]="['/menu/tabs/service-new']" routerDirection="root" color="primary">
+                  <ion-icon slot="icon-only" name="add-circle"></ion-icon>
+                </ion-button>
+              </ion-buttons>
+            </ion-item>
+            <ion-item>
+              <ion-label [routerLink]="['/menu/tabs/tag-list']" routerDirection="root">Tags({{ total.tagCount }})</ion-label>
+              <ion-buttons slot="end">
+                <ion-button [routerLink]="['/menu/tabs/tag-new']" routerDirection="root" color="medium">
+                  <ion-icon slot="icon-only" name="add-circle"></ion-icon>
+                </ion-button>
+              </ion-buttons>
+            </ion-item>
+            <ion-item [routerLink]="['/menu/tabs/block-list']" routerDirection="root">
+              <ion-label>Blocks({{ total.forumBlockCount + total.forumUserBlockCount + total.serviceBlockCount + total.serviceUserBlockCount }})</ion-label>
+            </ion-item>
+            <ion-item [routerLink]="['/menu/tabs/payment-list']" routerDirection="root">
+              <ion-label>Payments({{ total.paymentCount }})</ion-label>
+            </ion-item>
+            <ion-item [routerLink]="['/menu/tabs/receipt-list']" routerDirection="root">
+              <ion-label>Receipts({{ total.receiptCount }})</ion-label>
+            </ion-item>
+            <ion-item (click)="signOut()" style="cursor:pointer">
+              <ion-label>
+                Logout
+              </ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+        </ion-list>
+      </ng-container>
     </ion-content>
   </ion-menu>
   <ion-router-outlet id="content"></ion-router-outlet>

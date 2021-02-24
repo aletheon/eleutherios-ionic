@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ToastController, IonInput, NavController } from '@ionic/angular';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import firebase from 'firebase/app';
@@ -18,9 +18,7 @@ import {
   templateUrl: './tag-new.page.html',
   styleUrls: ['./tag-new.page.scss'],
 })
-export class TagNewPage implements OnInit, OnDestroy {
-  @ViewChild('mainTag', { static: false }) tagRef: IonInput;
-
+export class TagNewPage implements OnInit {
   public tagGroup: FormGroup;
   public loading: HTMLIonLoadingElement;
 
@@ -34,10 +32,8 @@ export class TagNewPage implements OnInit, OnDestroy {
   ) {
   }
 
-  async ngOnDestroy () {
-  }
-
   async ngOnInit() {
+    console.log('ngOnInit');
     this.tagGroup = this.fb.group({
       tagId:                              [''],
       uid:                                [''],
@@ -45,6 +41,11 @@ export class TagNewPage implements OnInit, OnDestroy {
       lastUpdateDate:                     [''],
       creationDate:                       ['']
     });
+  }
+
+  async ionViewWillEnter() {
+    console.log('ionViewWillEnter');
+    this.tagGroup.reset();
   }
 
   saveChanges () {
@@ -71,7 +72,7 @@ export class TagNewPage implements OnInit, OnDestroy {
           console.error(error);
         });
       }
-      else this.showError(`Tag with name '${this.tagGroup.get('tag').value}' already exists`);
+      else this.showError(`<center>Tag with name '${this.tagGroup.get('tag').value}' already exists</center>`);
     })
     .catch(error => {
       console.error(error);
@@ -81,7 +82,7 @@ export class TagNewPage implements OnInit, OnDestroy {
   async showSuccess() {
     const toast = await this.toastCtrl.create({
       duration: 3000,
-      message: `Successfully created tag '${ this.tagGroup.get('tag').value }'`,
+      message: `<center>Successfully created tag '${ this.tagGroup.get('tag').value }'</center>`,
       color: 'success'
     });
     toast.present();
@@ -89,8 +90,8 @@ export class TagNewPage implements OnInit, OnDestroy {
 
   async showError(error){
     const toast = await this.toastCtrl.create({
+      duration: 3000,
       message: error,
-      position: 'bottom',
       color: 'danger'
     });
     toast.present();
