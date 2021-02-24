@@ -34,7 +34,6 @@ import {
   Forum,
   Tag
 } from '../../models';
-import { stringify } from '@angular/compiler/src/util';
 
 @Component({
   selector: 'app-forum-new',

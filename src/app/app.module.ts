@@ -4,7 +4,6 @@ import { RouteReuseStrategy } from '@angular/router';
 
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { IonicSelectableModule } from 'ionic-selectable';
-import { AutoCompleteModule } from 'ionic4-auto-complete';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 
@@ -39,7 +38,6 @@ class CameraMock extends Camera {
     AngularFireStorageModule,
     AngularFireAuthGuardModule,
     IonicSelectableModule,
-    AutoCompleteModule,
     MomentModule
   ],
   providers: [
