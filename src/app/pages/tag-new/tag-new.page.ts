@@ -32,7 +32,6 @@ export class TagNewPage implements OnInit {
   }
 
   async ngOnInit() {
-    console.log('ngOnInit');
     this.tagGroup = this.fb.group({
       tagId:                              [''],
       uid:                                [''],
