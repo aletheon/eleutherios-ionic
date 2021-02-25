@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { ToastController, IonInput, NavController } from '@ionic/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ToastController, IonInput } from '@ionic/angular';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import firebase from 'firebase/app';
 import * as _ from "lodash";
@@ -19,6 +19,8 @@ import {
   styleUrls: ['./tag-new.page.scss'],
 })
 export class TagNewPage implements OnInit {
+  @ViewChild('submitButton', { static: false }) submitButtonRef: IonInput;
+
   public tagGroup: FormGroup;
   public loading: HTMLIonLoadingElement;
 
@@ -27,8 +29,7 @@ export class TagNewPage implements OnInit {
     private fb: FormBuilder,
     private userTagService: UserTagService,
     private tagService: TagService,
-    private toastCtrl: ToastController,
-    private navCtrl: NavController) {
+    private toastCtrl: ToastController) {
   }
 
   async ngOnInit() {
@@ -41,9 +42,11 @@ export class TagNewPage implements OnInit {
     });
   }
 
-  saveChanges () {
-    if (this.tagGroup.status != 'VALID')
+  async saveChanges () {
+    if (this.tagGroup.status != 'VALID'){
+      this.submitButtonRef.disabled = false;
       return;
+    }
 
     this.tagService.exists(this.tagGroup.get('tag').value).then(exists => {
       if (!exists){
@@ -58,16 +61,24 @@ export class TagNewPage implements OnInit {
 
         // Add tag
         this.userTagService.create(this.auth.uid, newTag).then(() => {
-          this.showSuccess();
-          this.navCtrl.pop();
+          this.showSuccess().then(() => {
+            this.submitButtonRef.disabled = false;
+          });
         })
         .catch(error => {
-          console.error(error);
+          this.showError(`<center>${error}</center>`).then(() => {
+            this.submitButtonRef.disabled = false;
+          });
         });
       }
-      else this.showError(`<center>Tag with name '${this.tagGroup.get('tag').value}' already exists</center>`);
+      else {
+        this.showError(`<center>Tag with name '${this.tagGroup.get('tag').value}' already exists</center>`).then(() => {
+          this.submitButtonRef.disabled = false;
+        });
+      }
     })
     .catch(error => {
+      this.submitButtonRef.disabled = false;
       console.error(error);
     });
   }

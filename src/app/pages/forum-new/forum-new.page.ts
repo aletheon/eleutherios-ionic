@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { LoadingController, ToastController, AlertController, IonInput } from '@ionic/angular';
-import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { Observable, Subscription, BehaviorSubject, of, from, combineLatest, zip, timer, defer, throwError } from 'rxjs';
@@ -70,7 +70,7 @@ export class ForumNewPage implements OnInit, OnDestroy {
     private userForumService: UserForumService,
     private userImageService: UserImageService,
     private userServiceTagService: UserServiceTagService,
-    private loadingController: LoadingController,
+    private loadingCtrl: LoadingController,
     private toastCtrl: ToastController,
     private alertCtrl: AlertController,
     private route: ActivatedRoute,
@@ -173,7 +173,7 @@ export class ForumNewPage implements OnInit, OnDestroy {
     this.forumGroup.get('searchPrivateServices').setValue(this.searchPrivateServices);
     this.forumGroup.get('searchServiceIncludeTagsInSearch').setValue(this.searchServiceIncludeTagsInSearch);
 
-    this.loading = await this.loadingController.create({
+    this.loading = await this.loadingCtrl.create({
       message: 'Loading...'
     });
     await this.loading.present();

@@ -1877,6 +1877,7 @@ exports.deleteUserAlert = functions.firestore.document("users/{userId}/alerts/{a
 // ********************************************************************************
 exports.createUserTag = functions.firestore.document("users/{userId}/tags/{tagId}").onCreate((snap, context) => {
   var tag = snap.data();
+  var tagRef = snap.ref;
   var userId = context.params.userId;
   var tagId = context.params.tagId;
 
@@ -1892,22 +1893,51 @@ exports.createUserTag = functions.firestore.document("users/{userId}/tags/{tagId
     });
   };
 
-  return admin.firestore().collection(`users/${userId}/tags`).select()
-    .get().then(snapshot => {
-      return admin.database().ref("totals").child(userId).once("value", totalSnapshot => {
-        if (totalSnapshot.exists())
-          return admin.database().ref("totals").child(userId).update({ tagCount: snapshot.size });
-        else
+  var tagExists = function() {
+    return new Promise((resolve, reject) => {
+      admin.firestore().collection('tags')
+        .where('tag', '==', tag.tag.toLowerCase())
+        .get().then(snapshot => {
+          if (snapshot.size > 0)
+            resolve(true);
+          else
+            resolve(false);
+        }
+      )
+      .catch(error => {
+        reject(error);
+      });
+    });
+  };
+
+  return tagExists().then((exists) => {
+    if (!exists){
+      return admin.firestore().collection(`users/${userId}/tags`).select()
+        .get().then(snapshot => {
+          return admin.database().ref("totals").child(userId).once("value", totalSnapshot => {
+            if (totalSnapshot.exists())
+              return admin.database().ref("totals").child(userId).update({ tagCount: snapshot.size });
+            else
+              return Promise.resolve();
+          });
+        }
+      ).then(() => {
+        return createPublicTag().then(() => {
           return Promise.resolve();
+        })
+        .catch(error => {
+          return Promise.reject(error);
+        });
+      })
+      .catch(error => {
+        return Promise.reject(error);
       });
     }
-  ).then(() => {
-    return createPublicTag().then(() => {
-      return Promise.resolve();
-    })
-    .catch(error => {
-      return Promise.reject(error);
-    });
+    else {
+      return tagRef.delete().then(() => {
+        return Promise.reject(`Tag with name '${tag.tag.toLowerCase()}' already exists`);
+      });
+    }
   })
   .catch(error => {
     return Promise.reject(error);

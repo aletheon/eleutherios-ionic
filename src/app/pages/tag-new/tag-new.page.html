@@ -5,7 +5,7 @@
 </ion-header>
 
 <ion-content>
-  <form [formGroup]="tagGroup" (ngSubmit)="saveChanges()" novalidate>
+  <form [formGroup]="tagGroup" (ngSubmit)="submitButton.disabled=true;saveChanges()" novalidate>
     <ion-item>
         <ion-label position="stacked">Name</ion-label>
         <ion-input formControlName="tag"></ion-input>
@@ -13,7 +13,7 @@
     <div class="ion-padding" style="color:rgb(245, 61, 61)" *ngIf="tagGroup.get('tag').hasError('pattern') && tagGroup.get('tag').dirty">
       Invalid characters, valid characters include [A-Za-z0-9 and space]
     </div>
-    <ion-button type="submit" expand="block" class="ion-padding-horizontal ion-margin-vertical" [disabled]="!tagGroup.valid">
+    <ion-button #submitButton type="submit" expand="block" class="ion-padding-horizontal ion-margin-vertical" [disabled]="!tagGroup.valid">
       Create
     </ion-button>
   </form>
