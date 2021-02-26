@@ -54,9 +54,9 @@ export class UserTagService {
     let collectionName: string = `users/${parentUserId}/tags`;
 
     if (!key)
-      return this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate').limit(numberOfItems+1)).valueChanges();
+      return this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate', 'desc').limit(numberOfItems+1)).valueChanges();
     else
-      return this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate').startAt(key).limit(numberOfItems+1)).valueChanges();
+      return this.afs.collection<any>(collectionName, ref => ref.orderBy('creationDate', 'desc').startAt(key).limit(numberOfItems+1)).valueChanges();
   }
 
   public search (parentUserId: string, searchTerm: any): Observable<any[]> {

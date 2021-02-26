@@ -32,7 +32,7 @@ export class TagNewPage implements OnInit {
     private toastCtrl: ToastController) {
   }
 
-  async ngOnInit() {
+  ngOnInit() {
     this.tagGroup = this.fb.group({
       tagId:                              [''],
       uid:                                [''],
