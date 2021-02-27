@@ -23,7 +23,7 @@ export class TagListPage implements OnInit {
   private _subscription: Subscription;
   private _totalSubscription: Subscription;
 
-  public numberItems: number = 5;
+  public numberItems: number = 10;
   public nextKey: any;
   public prevKeys: any[] = [];
   public loading: HTMLIonLoadingElement;
