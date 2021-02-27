@@ -23,7 +23,7 @@ export class TagListPage implements OnInit {
   private _subscription: Subscription;
   private _totalSubscription: Subscription;
 
-  public numberItems: number = 100;
+  public numberItems: number = 5;
   public nextKey: any;
   public prevKeys: any[] = [];
   public loading: HTMLIonLoadingElement;
@@ -41,8 +41,7 @@ export class TagListPage implements OnInit {
 
   trackTags (index, tag) { return tag.tagId; }
 
-  async ngOnInit() {
-    // reset keys if the route changes either public/private
+  async ionViewWillEnter() {
     this.nextKey = null;
     this.prevKeys = [];
 
@@ -58,6 +57,17 @@ export class TagListPage implements OnInit {
       }
     );
     this.getTagList();
+  }
+
+  async ionViewWillLeave() {
+    if (this._subscription)
+      this._subscription.unsubscribe();
+
+    if (this._totalSubscription)
+      this._totalSubscription.unsubscribe();
+  }
+
+  async ngOnInit() {
   }
 
   async getTagList (key?: any) {

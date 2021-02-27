@@ -51,4 +51,26 @@
 			</ng-template>
 		</ng-container>
   </ion-list>
+
+  <!-- paging -->
+	<ng-container *ngIf='prevKeys?.length || nextKey'>
+    <ion-list>
+      <ion-item lines="none">
+        <ion-button (click)="onPrev()" *ngIf='prevKeys?.length' slot="start">
+          <ion-icon name="arrow-back"></ion-icon>
+        </ion-button>
+        <ion-button (click)="onNext()" *ngIf='nextKey' slot="end">
+          <ion-icon name="arrow-forward"></ion-icon>
+        </ion-button>
+      </ion-item>
+    </ion-list>
+
+		<!-- <ion-button (click)="onPrev()" *ngIf='prevKeys?.length'>
+      <ion-icon slot="icon-only" name="arrow-dropleft-circle"></ion-icon>
+    </ion-button>
+		<ion-button (click)="onNext()" *ngIf='nextKey'>
+      <ion-icon slot="icon-only" name="arrow-dropright-circle"></ion-icon>
+    </ion-button> -->
+	</ng-container>
+
 </ion-content>
