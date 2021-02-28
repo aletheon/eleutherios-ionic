@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
-import { LoadingController, ToastController, AlertController, IonInput } from '@ionic/angular';
+import { ActivatedRoute } from '@angular/router';
+import { ToastController, AlertController, IonInput } from '@ionic/angular';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -71,7 +71,6 @@ export class ForumNewPage implements OnInit, OnDestroy {
     private userForumService: UserForumService,
     private userImageService: UserImageService,
     private userServiceTagService: UserServiceTagService,
-    private loadingCtrl: LoadingController,
     private toastCtrl: ToastController,
     private alertCtrl: AlertController,
     private route: ActivatedRoute,
@@ -169,21 +168,6 @@ export class ForumNewPage implements OnInit, OnDestroy {
     });
     this.forumGroup.get('type').setValue('Private');
     this.forumGroup.get('indexed').setValue(false);
-
-    this.loading = await this.loadingCtrl.create({
-      message: 'Loading...'
-    });
-    await this.loading.present();
-
-    this.route.queryParams.subscribe(async (params: Params) => {
-      // if (params['serviceId']){
-      //   console.log('params ' + params['serviceId']);
-      // }
-      // else {
-      //   console.log('no serviceId param');
-      // }
-      await this.loading.dismiss();
-    });
   }
 
   async saveChanges () {
