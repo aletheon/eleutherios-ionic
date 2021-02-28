@@ -187,6 +187,11 @@ export class ForumNewPage implements OnInit, OnDestroy {
   }
 
   async saveChanges () {
+    if (this.forumGroup.status != 'VALID'){
+      this.submitButtonRef.disabled = false;
+      return;
+    }
+
     let tempTitle = this.forumGroup.get('title').value.replace(/\s\s+/g,' ');
 
     if (tempTitle.length <= 100){
