@@ -45,12 +45,25 @@ export class UserForumService {
     return this.afs.collection(`users/${parentUserId}/forums`).doc(forumId).valueChanges();
   }
 
-  public create (parentUserId: string, data: any): Observable<any> {
-    const forumRef = this.afs.collection(`users/${parentUserId}/forums`).doc(this.afs.createId());
-    data.forumId = forumRef.ref.id;
-    forumRef.set(data);
-    return forumRef.valueChanges();
+  public create (parentUserId: string, data: any) {
+    return new Promise<void>((resolve, reject) => {
+      const forumRef = this.afs.collection(`users/${parentUserId}/forums`).doc(this.afs.createId());
+      data.forumId = forumRef.ref.id;
+      forumRef.set(data).then(() => {
+        resolve();
+      })
+      .catch((error) => {
+        reject(error);
+      });
+    });
   }
+
+  // public create (parentUserId: string, data: any): Observable<any> {
+  //   const forumRef = this.afs.collection(`users/${parentUserId}/forums`).doc(this.afs.createId());
+  //   data.forumId = forumRef.ref.id;
+  //   forumRef.set(data);
+  //   return forumRef.valueChanges();
+  // }
 
   public update (parentUserId: string, forumId: string, data: any) {
     const forumRef = this.afs.collection(`users/${parentUserId}/forums`).doc(forumId);

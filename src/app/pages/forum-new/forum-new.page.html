@@ -5,7 +5,7 @@
 </ion-header>
 
 <ion-content>
-  <form [formGroup]="forumGroup" (ngSubmit)="saveChanges()">
+  <form [formGroup]="forumGroup" (ngSubmit)="submitButton.disabled=true;saveChanges()">
     <ion-item lines="none">
       <ion-label>Active</ion-label>
       <ion-toggle formControlName="indexed"></ion-toggle>
@@ -21,6 +21,9 @@
         <ion-label position="stacked">Title</ion-label>
         <ion-input #mainTitle formControlName="title"></ion-input>
     </ion-item>
+    <div class="ion-padding" style="color:rgb(245, 61, 61)" *ngIf="forumGroup.get('title').hasError('pattern') && forumGroup.get('title').dirty">
+      Invalid characters, valid characters include [A-Za-z0-9._ and space]
+    </div>
     <ion-item>
         <ion-label position="stacked">Description</ion-label>
         <ion-textarea rows="3" formControlName="description"></ion-textarea>
@@ -41,17 +44,14 @@
         (onSearch)="searchTags($event)"
         (onChange)="tagChanged($event)"
         [isMultiple]="true"
-        [isConfirmButtonEnabled]="tagComponent.itemsToConfirm.length >= 1 && tagComponent.itemsToConfirm.length <= 3">
+        [isConfirmButtonEnabled]="tagComponent.itemsToConfirm.length >= 1 && tagComponent.itemsToConfirm.length <= 5">
         <ng-template ionicSelectableMessageTemplate>
-					Select between 1 to 3 items.
+					Select between 1 to 5 tags.
 				</ng-template>
       </ionic-selectable>
     </ion-item>
-    <ion-button type="submit" expand="block" class="ion-padding-horizontal ion-margin-vertical" [disabled]="!forumGroup.valid">
+    <ion-button #submitButton type="submit" expand="block" class="ion-padding-horizontal ion-margin-vertical" [disabled]="!forumGroup.valid">
       Create
-    </ion-button>
-    <ion-button type="button" expand="block" (click)="reset()" class="ion-padding-horizontal ion-margin-vertical">
-      Reset
     </ion-button>
   </form>
 </ion-content>
