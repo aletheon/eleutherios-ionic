@@ -1,34 +1,17 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { ToastController, AlertController, IonInput } from '@ionic/angular';
+import { ToastController, IonInput } from '@ionic/angular';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 
-import { Observable, Subscription, BehaviorSubject, of, from, combineLatest, zip, timer, defer, throwError } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { IonicSelectableComponent } from 'ionic-selectable';
 import firebase from 'firebase/app';
 
 import * as _ from "lodash";
 import {
   AuthService,
-  SiteTotalService,
-  UserServiceService,
-  UserActivityService,
   UserForumTagService,
-  UserForumImageService,
-  UserServiceImageService,
-  UserForumServiceBlockService,
-  UserServiceForumBlockService,
-  UserServiceBlockService,
-  UserServiceUserBlockService,
-  UserForumUserBlockService,
-  UserForumRegistrantService,
-  UserTagService,
-  ServiceService,
   TagService,
-  UserForumService,
-  UserImageService,
-  UserServiceTagService
+  UserForumService
 } from '../../services';
 import {
   Forum,
@@ -54,27 +37,10 @@ export class ForumNewPage implements OnInit, OnDestroy {
 
   constructor(private fb: FormBuilder,
     private auth: AuthService,
-    private siteTotalService: SiteTotalService,
-    private userActivityService: UserActivityService,
     private userForumTagService: UserForumTagService,
-    private userForumImageService: UserForumImageService,
-    private userServiceImageService: UserServiceImageService,
-    private userForumServiceBlockService: UserForumServiceBlockService,
-    private userServiceForumBlockService: UserServiceForumBlockService,
-    private userServiceBlockService: UserServiceBlockService,
-    private userServiceUserBlockService: UserServiceUserBlockService,
-    private userForumUserBlockService: UserForumUserBlockService,
-    private userForumRegistrantService: UserForumRegistrantService,
-    private userTagService: UserTagService,
     private tagService: TagService,
-    private serviceService: ServiceService,
     private userForumService: UserForumService,
-    private userImageService: UserImageService,
-    private userServiceTagService: UserServiceTagService,
-    private toastCtrl: ToastController,
-    private alertCtrl: AlertController,
-    private route: ActivatedRoute,
-    private router: Router) {
+    private toastCtrl: ToastController) {
   }
 
   filterTags(tags: Tag[], text: string) {
@@ -210,7 +176,7 @@ export class ForumNewPage implements OnInit, OnDestroy {
                         reject(error);
                       });
                     }
-                    else reject('This is the alpha version of eleutherios and is limited to only 5 tags each forum');
+                    else reject('This is the alpha version of eleutherios and is limited to only 5 tags per forum');
                   });
                 }
               });
