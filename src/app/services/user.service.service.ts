@@ -51,11 +51,17 @@ export class UserServiceService {
     return this.afs.collection(`users/${parentUserId}/services`).doc(serviceId).valueChanges();
   }
 
-  public create (parentUserId: string, data: any): Observable<any> {
-    const serviceRef = this.afs.collection(`users/${parentUserId}/services`).doc(this.afs.createId());
-    data.serviceId = serviceRef.ref.id;
-    serviceRef.set(data);
-    return serviceRef.valueChanges();
+  public create (parentUserId: string, data: any) {
+    return new Promise<string>((resolve, reject) => {
+      const serviceRef = this.afs.collection(`users/${parentUserId}/services`).doc(this.afs.createId());
+      data.serviceId = serviceRef.ref.id;
+      serviceRef.set(data).then(() => {
+        resolve(data.serviceId);
+      })
+      .catch((error) => {
+        reject(error);
+      });
+    });
   }
 
   public update (parentUserId: string, serviceId: string, data: any) {

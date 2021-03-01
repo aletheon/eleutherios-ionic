@@ -5631,321 +5631,6 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
     });
   };
 
-  var createAlerts = function (tags){
-    return new Promise((resolve, reject) => {
-      if (tags && tags.length > 0){
-        tagUtil.getCollectionTitlesFromTags(tags).then(collectionTitles => {
-          if (collectionTitles && collectionTitles.length > 0){
-            var counter = 0;
-            var notifications = [];
-
-            async.until((callback) => {
-              // fetch all of the notifications
-              admin.firestore().collection(`servicenotificationscollection/${collectionTitles[counter]}/notifications`)
-                .where('active', '==', true)
-                .get().then(snapshot => {
-                if (snapshot.size > 0){
-                  var promises = snapshot.docs.map(doc => {
-                    return new Promise((resolve, reject) => {
-                      notifications.push(doc.data());
-                      resolve();
-                    });
-                  });
-
-                  Promise.all(promises).then(() => {
-                    callback(null, counter > collectionTitles.length);
-                  })
-                  .catch(error => {
-                    reject(error);
-                  });
-                }
-                else callback(null, counter > collectionTitles.length);
-              })
-              .catch(error => {
-                callback(error, null);
-              });
-            }, (callback) => {
-              counter++;
-              callback();
-            }, () => {
-              // remove duplicate notifications
-              notifications = _.uniqBy(notifications, 'notificationId');
-
-              if (notifications.length > 0){
-                // create alerts
-                var promises = notifications.map(notification => {
-                  return new Promise((resolve, reject) => {
-                    var continueSendingAlert = function () {
-                      return new Promise((resolve, reject) => {
-                        // check if end user has already been notified about this alert
-                        admin.firestore().collection(`users/${notification.uid}/deletedAlerts`)
-                          .where('notificationId', '==', notification.notificationId)
-                          .where('forumServiceId', '==', serviceId)
-                          .get().then(deletedAlertSnapshot => {
-                            // continue creating alert
-                            if (deletedAlertSnapshot.size == 0){
-                              // check alert doesn't already exist in main (service/alert) collection
-                              admin.firestore().collection(`services/${serviceId}/alerts`)
-                                .where('notificationId', '==', notification.notificationId)
-                                .where('forumServiceId', '==', serviceId)
-                                .get().then(alertSnapshot => {
-                                  if (alertSnapshot.size == 0){ // alert doesn't exist so create it
-                                    if (newValue.title.length > 0 && newValue.uid != notification.uid){ // do not notify the owner of the service
-                                      // create alert
-                                      var newAlert = {
-                                        alertId: uuid.v4().replace(/-/g, ''),
-                                        notificationId: notification.notificationId,
-                                        notificationUid: notification.uid,
-                                        type: 'Service',
-                                        paymentType: notification.paymentType,
-                                        startAmount: notification.startAmount,
-                                        endAmount: notification.endAmount,
-                                        forumServiceId: serviceId,
-                                        forumServiceUid: newValue.uid,
-                                        viewed: false,
-                                        lastUpdateDate: FieldValue.serverTimestamp(),
-                                        creationDate: FieldValue.serverTimestamp()
-                                      };
-
-                                      async.parallel([
-                                        function (callback) {
-                                          // public alerts
-                                          var alertRef = admin.firestore().collection(`services/${serviceId}/alerts`).doc(newAlert.alertId);
-                                          alertRef.set(newAlert).then(() => {
-                                            console.log(`creating services/${serviceId}/alerts`);
-                                            callback(null, null);
-                                          })
-                                          .catch(error => {
-                                            callback(error);
-                                          });
-                                        },
-                                        function (callback){
-                                          // user or private alerts
-                                          var alertRef = admin.firestore().collection(`users/${notification.uid}/alerts`).doc(newAlert.alertId);
-                                          alertRef.set(newAlert).then(() => {
-                                            console.log(`creating users/${notification.uid}/alerts`);
-                                            callback(null, null);
-                                          })
-                                          .catch(error => {
-                                            callback(error);
-                                          });
-                                        }],
-                                        // optional callback
-                                        function (error, results) {
-                                          if (!error)
-                                            resolve()
-                                          else
-                                            reject(error);
-                                        }
-                                      );
-                                    }
-                                    else resolve();
-                                  }
-                                  else resolve();
-                                })
-                                .catch(error => {
-                                  reject(error);
-                                }
-                              );
-                            }
-                            else resolve();
-                          })
-                          .catch(error => {
-                            reject(error);
-                          }
-                        );
-                      });
-                    };
-
-                    if (newValue.paymentType == 'Payment' && notification.paymentType == 'Payment'){
-                      if ((notification.startAmount >= newValue.amount) && (notification.endAmount <= newValue.amount)){
-                        if (notification.currency && notification.currency.length > 0){
-                          if (newValue.currency = notification.currency){
-                            continueSendingAlert().then(() => {
-                              resolve();
-                            })
-                            .catch(error => {
-                              reject(error);
-                            });
-                          }
-                          else resolve();
-                        }
-                        else {
-                          continueSendingAlert().then(() => {
-                            resolve();
-                          })
-                          .catch(error => {
-                            reject(error);
-                          });
-                        }
-                      }
-                      else resolve();
-                    }
-                    else if (newValue.paymentType == 'Free' && notification.paymentType == 'Free'){
-                      continueSendingAlert().then(() => {
-                        resolve();
-                      })
-                      .catch(error => {
-                        reject(error);
-                      });
-                    }
-                    else resolve();
-                  });
-                });
-
-                Promise.all(promises).then(() => {
-                  resolve();
-                })
-                .catch(error => {
-                  reject(error);
-                });
-              }
-              else resolve();
-            });
-          }
-          else resolve();
-        });
-      }
-      else {
-        admin.firestore().collection(`servicenotificationsnotags`)
-          .where('active', '==', true)
-          .get().then(snapshot => {
-          if (snapshot.size > 0){
-            var promises = snapshot.docs.map(doc => {
-              return new Promise((resolve, reject) => {
-                var continueSendingAlert = function () {
-                  return new Promise((resolve, reject) => {
-                    // ensure alert doesn't exist in internal user delete alert collection
-                    admin.firestore().collection(`users/${doc.data().uid}/deletedAlerts`)
-                      .where('notificationId', '==', doc.data().notificationId)
-                      .where('forumServiceId', '==', serviceId)
-                      .get().then(deletedAlertSnapshot => {
-                        if (deletedAlertSnapshot.size == 0){ // it hasn't been removed by end user, continue creating
-                          // ensure alert doesn't exist in internal service alert collection
-                          admin.firestore().collection(`services/${serviceId}/alerts`)
-                            .where('notificationId', '==', doc.data().notificationId)
-                            .where('forumServiceId', '==', serviceId)
-                            .get().then(alertSnapshot => {
-                              if (alertSnapshot.size == 0){ // alert doesn't exist so create it
-                                if (newValue.title.length > 0 && newValue.uid != doc.data().uid){ // do not notify the owner of the service
-                                  // create alert
-                                  var newAlert = {
-                                    alertId: uuid.v4().replace(/-/g, ''),
-                                    notificationId: doc.data().notificationId,
-                                    notificationUid: doc.data().uid,
-                                    type: 'Service',
-                                    paymentType: notification.paymentType,
-                                    startAmount: notification.startAmount,
-                                    endAmount: notification.endAmount,
-                                    forumServiceId: serviceId,
-                                    forumServiceUid: newValue.uid,
-                                    viewed: false,
-                                    lastUpdateDate: FieldValue.serverTimestamp(),
-                                    creationDate: FieldValue.serverTimestamp()
-                                  };
-
-                                  async.parallel([
-                                    function (callback) {
-                                      // public alerts
-                                      var alertRef = admin.firestore().collection(`services/${serviceId}/alerts`).doc(newAlert.alertId);
-                                      alertRef.set(newAlert).then(() => {
-                                        console.log(`creating services/${serviceId}/alerts`);
-                                        callback(null, null);
-                                      })
-                                      .catch(error => {
-                                        callback(error);
-                                      });
-                                    },
-                                    function (callback){
-                                      // user or private alerts
-                                      var alertRef = admin.firestore().collection(`users/${doc.data().uid}/alerts`).doc(newAlert.alertId);
-                                      alertRef.set(newAlert).then(() => {
-                                        console.log(`creating users/${doc.data().uid}/alerts`);
-                                        callback(null, null);
-                                      })
-                                      .catch(error => {
-                                        callback(error);
-                                      });
-                                    }],
-                                    // optional callback
-                                    function (error, results) {
-                                      if (!error)
-                                        resolve()
-                                      else
-                                        reject(error);
-                                    }
-                                  );
-                                }
-                                else resolve();
-                              }
-                              else resolve();
-                            })
-                            .catch(error => {
-                              reject(error);
-                            }
-                          );
-                        }
-                        else resolve();
-                      })
-                      .catch(error => {
-                        reject(error);
-                      }
-                    );
-                  });
-                };
-
-                if (newValue.paymentType == 'Payment' && notification.paymentType == 'Payment'){
-                  if ((notification.startAmount >= newValue.amount) && (notification.endAmount <= newValue.amount)){
-                    if (notification.currency && notification.currency.length > 0){
-                      if (newValue.currency = notification.currency){
-                        continueSendingAlert().then(() => {
-                          resolve();
-                        })
-                        .catch(error => {
-                          reject(error);
-                        });
-                      }
-                      else resolve();
-                    }
-                    else {
-                      continueSendingAlert().then(() => {
-                        resolve();
-                      })
-                      .catch(error => {
-                        reject(error);
-                      });
-                    }
-                  }
-                  else resolve();
-                }
-                else if (newValue.paymentType == 'Free' && notification.paymentType == 'Free'){
-                  continueSendingAlert().then(() => {
-                    resolve();
-                  })
-                  .catch(error => {
-                    reject(error);
-                  });
-                }
-                else resolve();
-              });
-            });
-
-            Promise.all(promises).then(() => {
-              resolve();
-            })
-            .catch(error => {
-              reject(error);
-            });
-          }
-          else resolve();
-        })
-        .catch(error => {
-          reject(error);
-        });
-      }
-    });
-  };
-
   var removePublicService = function (tags) {
     return new Promise((resolve, reject) => {
       var removePublicCollectionTitles = function (tags){
@@ -6144,64 +5829,6 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
     });
   };
 
-  var removeAlerts = function () {
-    return new Promise((resolve, reject) => {
-			admin.firestore().collection(`services/${serviceId}/alerts`)
-				.get().then(snapshot => {
-					if (snapshot.size > 0){
-						var promises = snapshot.docs.map(alertDoc => {
-							return new Promise((resolve, reject) => {
-								// delete user alert
-								var removeUserAlert = function(){
-									return new Promise((resolve, reject) => {
-										admin.firestore().collection(`users/${alertDoc.data().notificationUid}/alerts`).doc(alertDoc.data().alertId).get().then(doc => {
-											if (doc.exists){
-												doc.ref.delete().then(() => {
-													resolve();
-												})
-												.catch(error => {
-													reject(error);
-												});
-											}
-											else resolve();
-										})
-										.catch(error => {
-											reject(error);
-										});
-									});
-								};
-
-								removeUserAlert().then(() => {
-									// remove public alert
-									alertDoc.ref.delete().then(() => {
-										resolve();
-									})
-									.catch(error => {
-										reject(error);
-									});
-								})
-								.catch(error => {
-									reject(error);
-								});
-							});
-						});
-
-						Promise.all(promises).then(() => {
-							resolve();
-						})
-						.catch(error => {
-							reject(error);
-						});
-					}
-					else resolve();
-				})
-				.catch(error => {
-					reject(error);
-				}
-			);
-    });
-  };
-
   var getTags = function (){
     return new Promise((resolve, reject) => {
       admin.firestore().collection(`users/${userId}/services/${serviceId}/tags`).get().then(snapshot => {
@@ -6226,12 +5853,7 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
       if (newValue.indexed == true && newValue.type == 'Public'){
         return createOrUpdatePublicService(tags).then(() => {
           return createOrUpdateAnonymousService(tags).then(() => {
-            return createAlerts(tags).then(() => {
-              return Promise.resolve();
-            })
-            .catch(error => {
-              return Promise.reject(error);
-            });
+            return Promise.resolve();
           })
           .catch(error => {
             return Promise.reject(error);
@@ -6245,12 +5867,7 @@ exports.updateUserService = functions.firestore.document("users/{userId}/service
         return removePublicService(tags).then(() => {
           return removeAnonymousService(tags).then(() => {
             if (newValue.type == 'Private'){
-              return removeAlerts().then(() => {
-                return Promise.resolve();
-              })
-              .catch(error => {
-                return Promise.reject(error);
-              });
+              return Promise.resolve();
             }
             else return Promise.resolve();
           })
@@ -6722,64 +6339,6 @@ exports.deleteUserService = functions.firestore.document("users/{userId}/service
     });
   };
 
-  var removeAlerts = function () {
-    return new Promise((resolve, reject) => {
-			admin.firestore().collection(`services/${serviceId}/alerts`)
-				.get().then(snapshot => {
-					if (snapshot.size > 0){
-						var promises = snapshot.docs.map(alertDoc => {
-							return new Promise((resolve, reject) => {
-								// delete user alert
-								var removeUserAlert = function(){
-									return new Promise((resolve, reject) => {
-										admin.firestore().collection(`users/${alertDoc.data().notificationUid}/alerts`).doc(alertDoc.data().alertId).get().then(doc => {
-											if (doc.exists){
-												doc.ref.delete().then(() => {
-													resolve();
-												})
-												.catch(error => {
-													reject(error);
-												});
-											}
-											else resolve();
-										})
-										.catch(error => {
-											reject(error);
-										});
-									});
-								};
-
-								removeUserAlert().then(() => {
-									// remove public alert
-									alertDoc.ref.delete().then(() => {
-										resolve();
-									})
-									.catch(error => {
-										reject(error);
-									});
-								})
-								.catch(error => {
-									reject(error);
-								});
-							});
-						});
-
-						Promise.all(promises).then(() => {
-							resolve();
-						})
-						.catch(error => {
-							reject(error);
-						});
-					}
-					else resolve();
-				})
-				.catch(error => {
-					reject(error);
-				}
-			);
-    });
-  };
-
   // users/${userId}/services/${serviceId}/forumblocks
   var removeForumBlocks = function () {
     return new Promise((resolve, reject) => {
@@ -6947,13 +6506,8 @@ exports.deleteUserService = functions.firestore.document("users/{userId}/service
                       if (service.type == 'Public'){
                         return removePublicService(tags).then(() => {
                           return removeAnonymousService(tags).then(() => {
-                            return removeAlerts().then(() => {
-                              return removeServiceTotals().then(() => {
-                                return Promise.resolve();
-                              })
-                              .catch(error => {
-                                return Promise.reject(error);
-                              });
+                            return removeServiceTotals().then(() => {
+                              return Promise.resolve();
                             })
                             .catch(error => {
                               return Promise.reject(error);
@@ -9362,13 +8916,12 @@ exports.createUserForum = functions.firestore.document("users/{userId}/forums/{f
     });
   };
 
-  // because something is playing up with firestore deleting posts
-  // so use RT db instead to store them, create the forum first
+  // because something is playing up with firestore db deleting posts
+  // so use firebase db instead
   var createForumRT = function () {
     return new Promise((resolve, reject) => {
       admin.database().ref(`users/${userId}/forums`).child(forumId).set({
         forumId: forumId
-        // posts: [] <-- we will create this when we need it
       })
       .then(() => {
         resolve();
@@ -9556,6 +9109,7 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
     });
   };
 
+  // check if there is a copy of this forum in the parent forum forums collection to be updated
   var updateParentForum = function () {
     return new Promise((resolve, reject) => {
       if ((newValue.parentId && newValue.parentId.length > 0) && (newValue.parentUid && newValue.parentUid.length > 0)){
@@ -9626,7 +9180,7 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
     });
   };
 
-  var addToUserNoTags = function () {
+  var addToUserForumNoTags = function () {
     return new Promise((resolve, reject) => {
       var forumRef = admin.firestore().collection(`users/${userId}/forumsnotags`).doc(forumId);
       forumRef.set(newValue).then(() => {
@@ -9638,7 +9192,7 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
     });
   };
 
-  var removeUserNoTags = function () {
+  var removeUserForumNoTags = function () {
     return new Promise((resolve, reject) => {
       var forumRef = admin.firestore().collection(`users/${userId}/forumsnotags`).doc(forumId);
       forumRef.get().then(doc => {
@@ -9658,7 +9212,7 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
   var updateUserForum = function (tags) {
     return new Promise((resolve, reject) => {
       if (tags && tags.length > 0){
-        removeUserNoTags().then(() => {
+        removeUserForumNoTags().then(() => {
           updateUserCollectionTitles(tags).then(() => {
             resolve();
           })
@@ -9671,7 +9225,7 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
         });
       }
       else {
-        addToUserNoTags().then(() => {
+        addToUserForumNoTags().then(() => {
           resolve();
         })
         .catch(error => {
@@ -10018,238 +9572,6 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
     });
   };
 
-  var createAlerts = function (tags){
-    return new Promise((resolve, reject) => {
-      if (tags && tags.length > 0){
-        tagUtil.getCollectionTitlesFromTags(tags).then(collectionTitles => {
-          if (collectionTitles && collectionTitles.length > 0){
-            var counter = 0;
-            var notifications = [];
-
-            async.until((callback) => {
-              // fetch all of the notifications
-              admin.firestore().collection(`forumnotificationscollection/${collectionTitles[counter]}/notifications`)
-                .where('active', '==', true)
-                .get().then(snapshot => {
-                if (snapshot.size > 0){
-                  var promises = snapshot.docs.map(doc => {
-                    return new Promise((resolve, reject) => {
-                      notifications.push(doc.data());
-                      resolve();
-                    });
-                  });
-
-                  Promise.all(promises).then(() => {
-                    callback(null, counter > collectionTitles.length);
-                  })
-                  .catch(error => {
-                    reject(error);
-                  });
-                }
-                else callback(null, counter > collectionTitles.length);
-              })
-              .catch(error => {
-                callback(error, null);
-              });
-            }, (callback) => {
-              counter++;
-              callback();
-            }, () => {
-              // remove duplicate notifications
-              notifications = _.uniqBy(notifications, 'notificationId'); // remove duplicates
-
-              if (notifications.length > 0){
-                // create alerts
-                var promises = notifications.map(notification => {
-                  return new Promise((resolve, reject) => {
-                    // ensure alert doesn't exist in internal user delete alert collection
-                    admin.firestore().collection(`users/${notification.uid}/deletedAlerts`)
-                      .where('notificationId', '==', notification.notificationId)
-                      .where('forumServiceId', '==', forumId)
-                      .get().then(deletedAlertSnapshot => {
-                        if (deletedAlertSnapshot.size == 0){ // it hasn't been removed by end user, continue creating
-                          // ensure alert doesn't exist in internal forum alert collection
-                          admin.firestore().collection(`forums/${forumId}/alerts`)
-                            .where('notificationId', '==', notification.notificationId)
-                            .where('forumServiceId', '==', forumId)
-                            .get().then(alertSnapshot => {
-                              if (alertSnapshot.size == 0){ // alert doesn't exist so create it
-                                if (newValue.title.length > 0 && newValue.uid != notification.uid){ // do not notify the owner of the forum
-                                  // create alert
-                                  var newAlert = {
-                                    alertId: uuid.v4().replace(/-/g, ''),
-                                    notificationId: notification.notificationId,
-                                    notificationUid: notification.uid,
-                                    type: 'Forum',
-                                    forumServiceId: forumId,
-                                    forumServiceUid: newValue.uid,
-                                    viewed: false,
-                                    lastUpdateDate: FieldValue.serverTimestamp(),
-                                    creationDate: FieldValue.serverTimestamp()
-                                  };
-
-                                  async.parallel([
-                                    function (callback) {
-                                      // public alerts
-                                      var alertRef = admin.firestore().collection(`forums/${forumId}/alerts`).doc(newAlert.alertId);
-                                      alertRef.set(newAlert).then(() => {
-                                        console.log(`creating forums/${forumId}/alerts`);
-                                        callback(null, null);
-                                      })
-                                      .catch(error => {
-                                        callback(error);
-                                      });
-                                    },
-                                    function (callback){
-                                      // user or private alerts
-                                      var alertRef = admin.firestore().collection(`users/${notification.uid}/alerts`).doc(newAlert.alertId);
-                                      alertRef.set(newAlert).then(() => {
-                                        console.log(`creating users/${notification.uid}/alerts`);
-                                        callback(null, null);
-                                      })
-                                      .catch(error => {
-                                        callback(error);
-                                      });
-                                    }],
-                                    // optional callback
-                                    function (error, results) {
-                                      if (!error)
-                                        resolve()
-                                      else
-                                        reject(error);
-                                    }
-                                  );
-                                }
-                                else resolve();
-                              }
-                              else resolve();
-                            })
-                            .catch(error => {
-                              reject(error);
-                            }
-                          );
-                        }
-                        else resolve();
-                      })
-                      .catch(error => {
-                        reject(error);
-                      }
-                    );
-                  });
-                });
-
-                Promise.all(promises).then(() => {
-                  resolve();
-                })
-                .catch(error => {
-                  reject(error);
-                });
-              }
-              else resolve();
-            });
-          }
-          else resolve();
-        });
-      }
-      else {
-        admin.firestore().collection(`forumnotificationsnotags`)
-          .where('active', '==', true)
-          .get().then(snapshot => {
-          if (snapshot.size > 0){
-            var promises = snapshot.docs.map(doc => {
-              return new Promise((resolve, reject) => {
-                // ensure alert doesn't exist in internal user delete alert collection
-                admin.firestore().collection(`users/${doc.data().uid}/deletedAlerts`)
-                  .where('notificationId', '==', doc.data().notificationId)
-                  .where('forumServiceId', '==', forumId)
-                  .get().then(deletedAlertSnapshot => {
-                    if (deletedAlertSnapshot.size == 0){ // it hasn't been removed by end user, continue creating
-                      // ensure alert doesn't exist in internal forum alert collection
-                      admin.firestore().collection(`forums/${forumId}/alerts`)
-                        .where('notificationId', '==', doc.data().notificationId)
-                        .where('forumServiceId', '==', forumId)
-                        .get().then(alertSnapshot => {
-                          if (alertSnapshot.size == 0){ // alert doesn't exist so create it
-                            if (newValue.title.length > 0 && newValue.uid != doc.data().uid){ // do not notify the owner of the forum
-                              // create alert
-                              var newAlert = {
-                                alertId: uuid.v4().replace(/-/g, ''),
-                                notificationId: doc.data().notificationId,
-                                notificationUid: doc.data().uid,
-                                type: 'Forum',
-                                forumServiceId: forumId,
-                                forumServiceUid: newValue.uid,
-                                viewed: false,
-                                lastUpdateDate: FieldValue.serverTimestamp(),
-                                creationDate: FieldValue.serverTimestamp()
-                              };
-
-                              async.parallel([
-                                function (callback) {
-                                  // public alerts
-                                  var alertRef = admin.firestore().collection(`forums/${forumId}/alerts`).doc(newAlert.alertId);
-                                  alertRef.set(newAlert).then(() => {
-                                    console.log(`creating forums/${forumId}/alerts`);
-                                    callback(null, null);
-                                  })
-                                  .catch(error => {
-                                    callback(error);
-                                  });
-                                },
-                                function (callback){
-                                  // user or private alerts
-                                  var alertRef = admin.firestore().collection(`users/${doc.data().uid}/alerts`).doc(newAlert.alertId);
-                                  alertRef.set(newAlert).then(() => {
-                                    console.log(`creating users/${doc.data().uid}/alerts`);
-                                    callback(null, null);
-                                  })
-                                  .catch(error => {
-                                    callback(error);
-                                  });
-                                }],
-                                // optional callback
-                                function (error, results) {
-                                  if (!error)
-                                    resolve()
-                                  else
-                                    reject(error);
-                                }
-                              );
-                            }
-                            else resolve();
-                          }
-                          else resolve();
-                        })
-                        .catch(error => {
-                          reject(error);
-                        }
-                      );
-                    }
-                    else resolve();
-                  })
-                  .catch(error => {
-                    reject(error);
-                  }
-                );
-              });
-            });
-
-            Promise.all(promises).then(() => {
-              resolve();
-            })
-            .catch(error => {
-              reject(error);
-            });
-          }
-          else resolve();
-        })
-        .catch(error => {
-          reject(error);
-        });
-      }
-    });
-  };
-
   var removePublicForum = function (tags) {
     return new Promise((resolve, reject) => {
       var removePublicCollectionTitles = function (tags){
@@ -10448,64 +9770,6 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
     });
   };
 
-  var removeAlerts = function () {
-    return new Promise((resolve, reject) => {
-			admin.firestore().collection(`forums/${forumId}/alerts`)
-				.get().then(snapshot => {
-					if (snapshot.size > 0){
-						var promises = snapshot.docs.map(alertDoc => {
-							return new Promise((resolve, reject) => {
-								// delete user alert
-								var removeUserAlert = function(){
-									return new Promise((resolve, reject) => {
-										admin.firestore().collection(`users/${alertDoc.data().notificationUid}/alerts`).doc(alertDoc.data().alertId).get().then(doc => {
-											if (doc.exists){
-												doc.ref.delete().then(() => {
-													resolve();
-												})
-												.catch(error => {
-													reject(error);
-												});
-											}
-											else resolve();
-										})
-										.catch(error => {
-											reject(error);
-										});
-									});
-								};
-
-								removeUserAlert().then(() => {
-									// remove public alert
-									alertDoc.ref.delete().then(() => {
-										resolve();
-									})
-									.catch(error => {
-										reject(error);
-									});
-								})
-								.catch(error => {
-									reject(error);
-								});
-							});
-						});
-
-						Promise.all(promises).then(() => {
-							resolve();
-						})
-						.catch(error => {
-							reject(error);
-						});
-					}
-					else resolve();
-				})
-				.catch(error => {
-					reject(error);
-				}
-			);
-    });
-  };
-
   var getTags = function (){
     return new Promise((resolve, reject) => {
       admin.firestore().collection(`users/${userId}/forums/${forumId}/tags`).get().then(snapshot => {
@@ -10532,12 +9796,7 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
           if (newValue.indexed == true && newValue.type == 'Public'){
             return createOrUpdatePublicForum(tags).then(() => {
               return createOrUpdateAnonymousForum(tags).then(() => {
-                return createAlerts(tags).then(() => {
-                  return Promise.resolve();
-                })
-                .catch(error => {
-                  return Promise.reject(error);
-                });
+                return Promise.resolve();
               })
               .catch(error => {
                 return Promise.reject(error);
@@ -10550,15 +9809,7 @@ exports.updateUserForum = functions.firestore.document("users/{userId}/forums/{f
           else {
             return removePublicForum(tags).then(() => {
               return removeAnonymousForum(tags).then(() => {
-                if (newValue.type == 'Private'){
-                  return removeAlerts().then(() => {
-                    return Promise.resolve();
-                  })
-                  .catch(error => {
-                    return Promise.reject(error);
-                  });
-                }
-                else return Promise.resolve();
+                return Promise.resolve();
               })
               .catch(error => {
                 return Promise.reject(error);
@@ -11119,64 +10370,6 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
     });
   };
 
-  var removeAlerts = function () {
-    return new Promise((resolve, reject) => {
-			admin.firestore().collection(`forums/${forumId}/alerts`)
-				.get().then(snapshot => {
-					if (snapshot.size > 0){
-						var promises = snapshot.docs.map(alertDoc => {
-							return new Promise((resolve, reject) => {
-								// delete user alert
-								var removeUserAlert = function(){
-									return new Promise((resolve, reject) => {
-										admin.firestore().collection(`users/${alertDoc.data().notificationUid}/alerts`).doc(alertDoc.data().alertId).get().then(doc => {
-											if (doc.exists){
-												doc.ref.delete().then(() => {
-													resolve();
-												})
-												.catch(error => {
-													reject(error);
-												});
-											}
-											else resolve();
-										})
-										.catch(error => {
-											reject(error);
-										});
-									});
-								};
-
-								removeUserAlert().then(() => {
-									// remove public alert
-									alertDoc.ref.delete().then(() => {
-										resolve();
-									})
-									.catch(error => {
-										reject(error);
-									});
-								})
-								.catch(error => {
-									reject(error);
-								});
-							});
-						});
-
-						Promise.all(promises).then(() => {
-							resolve();
-						})
-						.catch(error => {
-							reject(error);
-						});
-					}
-					else resolve();
-				})
-				.catch(error => {
-					reject(error);
-				}
-			);
-    });
-  };
-
   // users/${userId}/forums/${forumId}/serviceblocks
   var removeServiceBlocks = function () {
     return new Promise((resolve, reject) => {
@@ -11287,13 +10480,8 @@ exports.deleteUserForum = functions.firestore.document("users/{userId}/forums/{f
                             if (forum.type == 'Public'){
                               return removePublicForum(tags).then(() => {
                                 return removeAnonymousForum(tags).then(() => {
-                                  return removeAlerts().then(() => {
-                                    return removeForumTotals().then(() => {
-                                      return Promise.resolve();
-                                    })
-                                    .catch(error => {
-                                      return Promise.reject(error);
-                                    });
+                                  return removeForumTotals().then(() => {
+                                    return Promise.resolve();
                                   })
                                   .catch(error => {
                                     return Promise.reject(error);

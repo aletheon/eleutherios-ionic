@@ -45,7 +45,7 @@ export class ForumNewPage implements OnInit, OnDestroy {
   @ViewChild('mainTitle', { static: false }) titleRef: IonInput;
 
   private _searchTagsSubscription: Subscription;
-  private _selectedTags: Tag[];
+  private _selectedTags: Tag[] = [];
 
   public forumGroup: FormGroup;
   public searchPrivateServices: boolean = false;
@@ -89,14 +89,6 @@ export class ForumNewPage implements OnInit, OnDestroy {
     value: any
   }) {
     this._selectedTags = event.value;
-
-    let output: string = '';
-
-    // Use of _.forEach() method
-    _.forEach(this._selectedTags, function(value) {
-      output += value.tag + ',';
-    });
-    console.log(output.substring(0, output.length-1));
   }
 
   searchTags(event: {
@@ -142,6 +134,7 @@ export class ForumNewPage implements OnInit, OnDestroy {
     this.forumGroup.reset();
     this.forumGroup.get('indexed').setValue(false);
     this.forumGroup.get('type').setValue('Private');
+    this._selectedTags = [];
   }
 
   async ngOnInit() {
@@ -197,10 +190,49 @@ export class ForumNewPage implements OnInit, OnDestroy {
         creationDate: firebase.firestore.FieldValue.serverTimestamp()
       };
 
-      this.userForumService.create(this.auth.uid, data).then(() => {
-        this.showSuccess().then(() => {
-          this.submitButtonRef.disabled = false;
-        });
+      this.userForumService.create(this.auth.uid, data).then(forumId => {
+        if (this._selectedTags.length > 0){
+          var promises = this._selectedTags.map(tag => {
+            return new Promise<void>((resolve, reject) => {
+              this.userForumTagService.exists(this.auth.uid, forumId, tag.tagId).then(exists => {
+                if (!exists){
+                  this.userForumTagService.getTagCount(this.auth.uid, forumId).then(count => {
+                    if (count < 5){
+                      this.userForumTagService.create(this.auth.uid, forumId, tag)
+                        .then(() => {
+                          // delay to prevent user adding multiple tags simultaneously
+                          setTimeout(() => {
+                            resolve();
+                          }, 1000);
+                        }
+                      )
+                      .catch(error => {
+                        reject(error);
+                      });
+                    }
+                    else reject('This is the alpha version of eleutherios and is limited to only 5 tags each forum');
+                  });
+                }
+              });
+            });
+          });
+
+          Promise.all(promises).then(() => {
+            this.showSuccess().then(() => {
+              this.submitButtonRef.disabled = false;
+            });
+          })
+          .catch(error => {
+            this.showError(`<center>${error}</center>`).then(() => {
+              this.submitButtonRef.disabled = false;
+            });
+          });
+        }
+        else {
+          this.showSuccess().then(() => {
+            this.submitButtonRef.disabled = false;
+          });
+        }
       })
       .catch(error => {
         this.showError(`<center>${error}</center>`).then(() => {
