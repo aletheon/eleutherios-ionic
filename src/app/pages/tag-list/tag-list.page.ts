@@ -85,28 +85,25 @@ export class TagListPage implements OnInit {
       switchMap(tags => {
         if (tags && tags.length > 0){
           let observables = tags.map(tag => {
-            if (tag){
-              let getTagTotal$ = that.siteTotalService.getTotal(tag.tagId);
+            let getTagTotal$ = that.siteTotalService.getTotal(tag.tagId);
 
-              return combineLatest([getTagTotal$]).pipe(
-                switchMap(results => {
-                  const [tagTotal] = results;
+            return combineLatest([getTagTotal$]).pipe(
+              switchMap(results => {
+                const [tagTotal] = results;
 
-                  if (tagTotal){
-                    tag.forumCount = tagTotal.forumCount;
-                    tag.serviceCount = tagTotal.serviceCount;
-                    tag.notificationCount = tagTotal.notificationCount;
-                  }
-                  else {
-                    tag.forumCount = 0;
-                    tag.serviceCount = 0;
-                    tag.notificationCount = 0;
-                  }
-                  return of(tag);
-                })
-              );
-            }
-            else return of(null);
+                if (tagTotal){
+                  tag.forumCount = tagTotal.forumCount;
+                  tag.serviceCount = tagTotal.serviceCount;
+                  tag.notificationCount = tagTotal.notificationCount;
+                }
+                else {
+                  tag.forumCount = 0;
+                  tag.serviceCount = 0;
+                  tag.notificationCount = 0;
+                }
+                return of(tag);
+              })
+            );
           });
 
           return zip(...observables, (...results) => {
