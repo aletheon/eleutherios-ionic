@@ -20,14 +20,14 @@
                     </ion-label>
                   </ion-col>
                   <ion-col>
-                    <ion-button *ngIf="auth.uid == forum.uid" routerLink="edit">
+                    <ion-button *ngIf="auth.uid == forum.uid" [routerLink]="['/menu/tabs/forum-edit']">
                       <ion-icon name="pencil-outline"></ion-icon>
                     </ion-button>
                   </ion-col>
                 </ion-row>
               </ion-grid>
             </ion-item>
-            <ion-item-options side="end">
+            <ion-item-options *ngIf="auth.uid == forum.uid" side="end">
               <ion-item-option (click)="delete(forum)">delete</ion-item-option>
             </ion-item-options>
           </ion-item-sliding>

@@ -29,6 +29,10 @@ const routes: Routes = [
         loadChildren: () => import('../forum-new/forum-new.module').then( m => m.ForumNewPageModule)
       },
       {
+        path: 'forum-edit',
+        loadChildren: () => import('../forum-edit/forum-edit.module').then( m => m.ForumEditPageModule)
+      },
+      {
         path: 'forum-list',
         loadChildren: () => import('../forum-list/forum-list.module').then( m => m.ForumListPageModule)
       },
@@ -39,6 +43,10 @@ const routes: Routes = [
       {
         path: 'service-new',
         loadChildren: () => import('../service-new/service-new.module').then( m => m.ServiceNewPageModule)
+      },
+      {
+        path: 'service-edit',
+        loadChildren: () => import('../service-edit/service-edit.module').then( m => m.ServiceEditPageModule)
       },
       {
         path: 'service-list',
