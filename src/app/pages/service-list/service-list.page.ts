@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { LoadingController, ToastController } from '@ionic/angular';
 import firebase from 'firebase/app';
-import * as lodash from "lodash";
 
 import {
   AuthService,
