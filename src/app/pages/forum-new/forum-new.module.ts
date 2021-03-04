@@ -4,11 +4,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 import { IonicSelectableModule } from 'ionic-selectable';
+import { MomentModule } from 'angular2-moment';
 
 import { ForumNewPageRoutingModule } from './forum-new-routing.module';
 
 import { ForumNewPage } from './forum-new.page';
-import { MomentModule } from 'angular2-moment';
 
 @NgModule({
   imports: [

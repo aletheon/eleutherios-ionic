@@ -98,8 +98,16 @@ export class ForumNewPage implements OnInit, OnDestroy {
 
   async ionViewWillEnter() {
     this.forumGroup.reset();
-    this.forumGroup.get('indexed').setValue(false);
+    this.forumGroup.get('uid').setValue(this.auth.uid);
+    this.forumGroup.get('parentId').setValue('');
+    this.forumGroup.get('parentUid').setValue('');
     this.forumGroup.get('type').setValue('Private');
+    this.forumGroup.get('description').setValue('');
+    this.forumGroup.get('website').setValue('');
+    this.forumGroup.get('indexed').setValue(false);
+    this.forumGroup.get('includeDescriptionInDetailPage').setValue(false);
+    this.forumGroup.get('includeImagesInDetailPage').setValue(false);
+    this.forumGroup.get('includeTagsInDetailPage').setValue(false);
     this._selectedTags = [];
   }
 
@@ -125,16 +133,6 @@ export class ForumNewPage implements OnInit, OnDestroy {
       lastUpdateDate:                     [''],
       creationDate:                       ['']
     });
-    this.forumGroup.get('uid').setValue(this.auth.uid);
-    this.forumGroup.get('parentId').setValue('');
-    this.forumGroup.get('parentUid').setValue('');
-    this.forumGroup.get('type').setValue('Private');
-    this.forumGroup.get('description').setValue('');
-    this.forumGroup.get('website').setValue('');
-    this.forumGroup.get('indexed').setValue(false);
-    this.forumGroup.get('includeDescriptionInDetailPage').setValue(false);
-    this.forumGroup.get('includeImagesInDetailPage').setValue(false);
-    this.forumGroup.get('includeTagsInDetailPage').setValue(false);
   }
 
   async saveChanges () {

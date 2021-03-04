@@ -98,58 +98,56 @@ export class ServiceNewPage implements OnInit, OnDestroy {
 
   async ionViewWillEnter() {
     this.serviceGroup.reset();
-    this.serviceGroup.get('indexed').setValue(false);
+    this.serviceGroup.get('uid').setValue(this.auth.uid);
     this.serviceGroup.get('type').setValue('Private');
+    this.serviceGroup.get('description').setValue('');
+    this.serviceGroup.get('website').setValue('');
+    this.serviceGroup.get('default').setValue(false);
+    this.serviceGroup.get('indexed').setValue(false);
+    this.serviceGroup.get('rate').setValue(0);
+    this.serviceGroup.get('paymentType').setValue('Free');
+    this.serviceGroup.get('amount').setValue(0.50);
+    this.serviceGroup.get('typeOfPayment').setValue('One-off');
+    this.serviceGroup.get('paymentId').setValue('');
+    this.serviceGroup.get('paymentUserId').setValue('');
+    this.serviceGroup.get('includeDescriptionInDetailPage').setValue(false);
+    this.serviceGroup.get('includeImagesInDetailPage').setValue(false);
+    this.serviceGroup.get('includeTagsInDetailPage').setValue(false);
     this._selectedTags = [];
+
+    const userSubscription = this.auth.user.subscribe(user => {
+      userSubscription.unsubscribe();
+      this.serviceGroup.get('currency').setValue(user.stripeCurrency && user.stripeCurrency.length > 0 ? user.stripeCurrency : 'usd');
+    });
   }
 
   async ngOnInit() {
     this.searchPrivateServices = true;
     this.searchServiceIncludeTagsInSearch = true;
 
-    const userSubscription = this.auth.user.subscribe(user => {
-      userSubscription.unsubscribe();
-
-      this.serviceGroup = this.fb.group({
-        serviceId:                          [''],
-        uid:                                [''],
-        type:                               [''],
-        title:                              ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9._\s]*$/)]],
-        title_lowercase:                    [''],
-        description:                        [''],
-        website:                            [''],
-        default:                            [''],
-        indexed:                            [''],
-        rate:                               [''],
-        paymentType:                        [''],
-        amount:                             ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0.50), Validators.max(999999.99)]],
-        typeOfPayment:                      [''],
-        currency:                           [''],
-        paymentId:                          [''],
-        paymentUserId:                      [''],
-        includeDescriptionInDetailPage:     [''],
-        includeImagesInDetailPage:          [''],
-        includeTagsInDetailPage:            [''],
-        tag:                                [''],
-        lastUpdateDate:                     [''],
-        creationDate:                       ['']
-      });
-      this.serviceGroup.get('uid').setValue(this.auth.uid);
-      this.serviceGroup.get('type').setValue('Private');
-      this.serviceGroup.get('description').setValue('');
-      this.serviceGroup.get('website').setValue('');
-      this.serviceGroup.get('default').setValue(false);
-      this.serviceGroup.get('indexed').setValue(false);
-      this.serviceGroup.get('rate').setValue(0);
-      this.serviceGroup.get('paymentType').setValue('Free');
-      this.serviceGroup.get('amount').setValue(0.50);
-      this.serviceGroup.get('typeOfPayment').setValue('One-off');
-      this.serviceGroup.get('currency').setValue(user.stripeCurrency && user.stripeCurrency.length > 0 ? user.stripeCurrency : 'usd');
-      this.serviceGroup.get('paymentId').setValue('');
-      this.serviceGroup.get('paymentUserId').setValue('');
-      this.serviceGroup.get('includeDescriptionInDetailPage').setValue(false);
-      this.serviceGroup.get('includeImagesInDetailPage').setValue(false);
-      this.serviceGroup.get('includeTagsInDetailPage').setValue(false);
+    this.serviceGroup = this.fb.group({
+      serviceId:                          [''],
+      uid:                                [''],
+      type:                               [''],
+      title:                              ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9._\s]*$/)]],
+      title_lowercase:                    [''],
+      description:                        [''],
+      website:                            [''],
+      default:                            [''],
+      indexed:                            [''],
+      rate:                               [''],
+      paymentType:                        [''],
+      amount:                             ['', [Validators.required, Validators.pattern(/^\s*-?\d+(\.\d{1,2})?\s*$/), Validators.min(0.50), Validators.max(999999.99)]],
+      typeOfPayment:                      [''],
+      currency:                           [''],
+      paymentId:                          [''],
+      paymentUserId:                      [''],
+      includeDescriptionInDetailPage:     [''],
+      includeImagesInDetailPage:          [''],
+      includeTagsInDetailPage:            [''],
+      tag:                                [''],
+      lastUpdateDate:                     [''],
+      creationDate:                       ['']
     });
   }
 
