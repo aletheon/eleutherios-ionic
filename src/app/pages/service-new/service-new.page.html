@@ -4,33 +4,180 @@
   </ion-toolbar>
 </ion-header>
 
+<!-- public paymentTypes: string[] = ['Free', 'Payment'];
+public typesOfPayments: string[] = ['One-off', 'On-going']; -->
+
 <ion-content>
   <form [formGroup]="serviceGroup" (ngSubmit)="submitButton.disabled=true;saveChanges()">
     <ion-item lines="none">
       <ion-label>Active</ion-label>
       <ion-toggle formControlName="indexed"></ion-toggle>
     </ion-item>
-    <ion-item >
+    <ion-item>
       <ion-label>Type</ion-label>
       <ion-select formControlName="type">
-          <ion-select-option value="Private">Private</ion-select-option>
-          <ion-select-option value="Public">Public</ion-select-option>
+        <ion-select-option value="Private">Private</ion-select-option>
+        <ion-select-option value="Public">Public</ion-select-option>
       </ion-select>
     </ion-item>
     <ion-item>
-        <ion-label position="stacked">Title</ion-label>
-        <ion-input #mainTitle formControlName="title"></ion-input>
+      <ion-label>Payment Type</ion-label>
+      <ion-select formControlName="paymentType">
+        <ion-select-option value="Free">Free</ion-select-option>
+        <ion-select-option value="Pay">Pay</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item *ngIf="serviceGroup.get('paymentType').value == 'Pay'">
+      <ng-container *ngIf="auth.user | async;let userItem">
+        <ng-container *ngIf="userItem.stripeOnboardingStatus == 'Authorized'; else onboarduser">
+          <ion-label>Amount</ion-label>
+          <ion-input formControlName="amount"></ion-input>
+        </ng-container>
+        <div class="ion-padding" style="color:rgb(245, 61, 61)" *ngIf="serviceGroup.get('amount').hasError('pattern') && serviceGroup.get('amount').dirty">
+          Amount required
+        </div>
+        <div class="ion-padding" style="color:rgb(245, 61, 61)" *ngIf="serviceGroup.get('amount').hasError('min') && serviceGroup.get('amount').dirty">
+          Must be greater than 0.50
+        </div>
+        <div class="ion-padding" style="color:rgb(245, 61, 61)" *ngIf="serviceGroup.get('amount').hasError('max') && serviceGroup.get('amount').dirty">
+          Must be less than 999999.99
+        </div>
+
+        <ng-template #onboarduser>
+          <ion-item>
+            <ion-grid>
+              <ion-row class="ion-align-items-center">
+                <ion-col size="9">
+                  <ion-label>
+                    <h2>{{ service.title }}</h2>
+                  </ion-label>
+                </ion-col>
+                <ion-col>
+                  <ion-button *ngIf="auth.uid == service.uid" routerLink="edit">
+                    <ion-icon name="pencil-outline"></ion-icon>
+                  </ion-button>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+
+
+
+
+            <ion-label>Payment Type</ion-label>
+            <ion-select formControlName="paymentType">
+              <ion-select-option value="Free">Free</ion-select-option>
+              <ion-select-option value="Pay">Pay</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+
+
+          <!-- <div style="display:flex;flex-direction:row;align-items:center">
+            <button [disabled]="stripeButtonDisabled" (click)="stripeConnect()" style="flex:none;border:none;padding:0;margin:0 10px 0 0">
+              <img src="../../../../assets/blue-on-dark.png" />
+            </button>
+            <div class="label label-warning" *ngIf="userItem.stripeOnboardingStatus == 'Pending'" style="flex:none">
+              Pending
+            </div>
+            <div class="label label-alert" *ngIf="userItem.stripeOnboardingStatus == 'Deauthorized'" style="flex:none">
+              Deauthorized
+            </div>
+            <mat-spinner *ngIf="stripeButtonDisabled" diameter="30" style="flex:none"></mat-spinner>
+          </div> -->
+
+
+        </ng-template>
+      </ng-container>
+    </ion-item>
+
+
+    <!-- <ion-label>Payment Type</ion-label>
+    <ion-select formControlName="paymentType">
+      <ion-select-option value="Free">Free</ion-select-option>
+      <ion-select-option value="Pay">Pay</ion-select-option>
+    </ion-select> -->
+
+    <!-- <div style="margin-bottom:10px" *ngIf="serviceGroup.get('paymentType').value == 'Payment'">
+      <ng-container *ngIf="auth.user | async;let userItem">
+        <ng-container *ngIf="userItem.stripeOnboardingStatus == 'Authorized'; else onboarduser">
+          <div style="display:flex;flex-direction:row;align-items:center">
+            <mat-form-field style="flex:none;width:100px">
+              <input
+                matInput
+                #amount
+                placeholder="e.g. 1.95"
+                formControlName="amount"
+                (change)="saveChanges()"/>
+              <mat-error *ngIf="serviceGroup.get('amount').hasError('pattern')">
+                Amount required
+              </mat-error>
+              <mat-error *ngIf="serviceGroup.get('amount').hasError('min')">
+                Must be greater than 0.50
+              </mat-error>
+              <mat-error *ngIf="serviceGroup.get('amount').hasError('max')">
+                Must be less than 999999.99
+              </mat-error>
+            </mat-form-field>
+            <div style="flex:1;align-items:flex-start">
+              {{ userItem.stripeCurrency.toUpperCase() }}
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:row;align-items:center">
+            <div style="flex:1">
+              <mat-form-field style="width:100px">
+                <mat-select formControlName="typeOfPayment" (selectionChange)="saveChanges()">
+                  <mat-option *ngFor="let t of typesOfPayments" [value]="t">{{ t }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </ng-container>
+        <ng-template #onboarduser>
+          <div style="display:flex;flex-direction:row;align-items:center">
+            <button [disabled]="stripeButtonDisabled" (click)="stripeConnect()" style="flex:none;border:none;padding:0;margin:0 10px 0 0">
+              <img src="../../../../assets/blue-on-dark.png" />
+            </button>
+            <div class="label label-warning" *ngIf="userItem.stripeOnboardingStatus == 'Pending'" style="flex:none">
+              Pending
+            </div>
+            <div class="label label-alert" *ngIf="userItem.stripeOnboardingStatus == 'Deauthorized'" style="flex:none">
+              Deauthorized
+            </div>
+            <mat-spinner *ngIf="stripeButtonDisabled" diameter="30" style="flex:none"></mat-spinner>
+          </div>
+        </ng-template>
+      </ng-container>
+    </div> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <ion-item>
+      <ion-label position="stacked">Title</ion-label>
+      <ion-input #mainTitle formControlName="title"></ion-input>
     </ion-item>
     <div class="ion-padding" style="color:rgb(245, 61, 61)" *ngIf="serviceGroup.get('title').hasError('pattern') && serviceGroup.get('title').dirty">
       Invalid characters, valid characters include [A-Za-z0-9._ and space]
     </div>
     <ion-item>
-        <ion-label position="stacked">Description</ion-label>
-        <ion-textarea rows="3" formControlName="description"></ion-textarea>
+      <ion-label position="stacked">Description</ion-label>
+      <ion-textarea rows="3" formControlName="description"></ion-textarea>
     </ion-item>
     <ion-item>
-        <ion-label position="stacked">Website</ion-label>
-        <ion-input formControlName="website"></ion-input>
+      <ion-label position="stacked">Website</ion-label>
+      <ion-input formControlName="website"></ion-input>
     </ion-item>
     <ion-item>
       <ion-label position="stacked">Tags</ion-label>
