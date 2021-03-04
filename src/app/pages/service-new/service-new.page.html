@@ -1,11 +1,57 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
-    <!-- <ion-buttons slot="end">
-      <ion-back-button></ion-back-button>
-    </ion-buttons> -->
     <ion-title>Create Service</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
+  <form [formGroup]="serviceGroup" (ngSubmit)="submitButton.disabled=true;saveChanges()">
+    <ion-item lines="none">
+      <ion-label>Active</ion-label>
+      <ion-toggle formControlName="indexed"></ion-toggle>
+    </ion-item>
+    <ion-item >
+      <ion-label>Type</ion-label>
+      <ion-select formControlName="type">
+          <ion-select-option value="Private">Private</ion-select-option>
+          <ion-select-option value="Public">Public</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+        <ion-label position="stacked">Title</ion-label>
+        <ion-input #mainTitle formControlName="title"></ion-input>
+    </ion-item>
+    <div class="ion-padding" style="color:rgb(245, 61, 61)" *ngIf="serviceGroup.get('title').hasError('pattern') && serviceGroup.get('title').dirty">
+      Invalid characters, valid characters include [A-Za-z0-9._ and space]
+    </div>
+    <ion-item>
+        <ion-label position="stacked">Description</ion-label>
+        <ion-textarea rows="3" formControlName="description"></ion-textarea>
+    </ion-item>
+    <ion-item>
+        <ion-label position="stacked">Website</ion-label>
+        <ion-input formControlName="website"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Tags</ion-label>
+      <ionic-selectable
+        #tagComponent
+        formControlName="tag"
+        [items]="tags"
+        itemValueField="tagId"
+        itemTextField="tag"
+        [canSearch]="true"
+        (onSearch)="searchTags($event)"
+        (onChange)="tagChanged($event)"
+        [isMultiple]="true"
+        [isConfirmButtonEnabled]="tagComponent.itemsToConfirm.length >= 1 && tagComponent.itemsToConfirm.length <= 5">
+        <ng-template ionicSelectableMessageTemplate>
+					Select between 1 to 5 tags.
+				</ng-template>
+      </ionic-selectable>
+    </ion-item>
+    <ion-button #submitButton type="submit" expand="block" class="ion-padding-horizontal ion-margin-vertical" [disabled]="!serviceGroup.valid">
+      Create
+    </ion-button>
+  </form>
 </ion-content>

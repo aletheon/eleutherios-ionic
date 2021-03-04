@@ -1,8 +1,8 @@
 export interface Forum {
   forumId: string, // unique id
+  uid: string, // id of the user who created this forum
   parentId: string, // id of the forum, that this forum belongs to
   parentUid: string, // id of the user who owns the parent forum
-  uid: string, // id of the user who created this forum
   type: string, // [public or private]
   title: string, // title of the forum
   title_lowercase: string, // for case insensitive searching

@@ -109,9 +109,9 @@ export class ForumNewPage implements OnInit, OnDestroy {
 
     this.forumGroup = this.fb.group({
       forumId:                            [''],
+      uid:                                [''],
       parentId:                           [''],
       parentUid:                          [''],
-      uid:                                [''],
       type:                               [''],
       title:                              ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9._\s]*$/)]],
       title_lowercase:                    [''],
@@ -125,8 +125,16 @@ export class ForumNewPage implements OnInit, OnDestroy {
       lastUpdateDate:                     [''],
       creationDate:                       ['']
     });
+    this.forumGroup.get('uid').setValue(this.auth.uid);
+    this.forumGroup.get('parentId').setValue('');
+    this.forumGroup.get('parentUid').setValue('');
     this.forumGroup.get('type').setValue('Private');
+    this.forumGroup.get('description').setValue('');
+    this.forumGroup.get('website').setValue('');
     this.forumGroup.get('indexed').setValue(false);
+    this.forumGroup.get('includeDescriptionInDetailPage').setValue(false);
+    this.forumGroup.get('includeImagesInDetailPage').setValue(false);
+    this.forumGroup.get('includeTagsInDetailPage').setValue(false);
   }
 
   async saveChanges () {
@@ -140,31 +148,31 @@ export class ForumNewPage implements OnInit, OnDestroy {
     if (tempTitle.length <= 100){
       const data: Forum = {
         forumId: '',
-        parentId: '',
-        parentUid: '',
-        uid: this.auth.uid,
+        uid: this.forumGroup.get('uid').value,
+        parentId: this.forumGroup.get('parentId').value,
+        parentUid: this.forumGroup.get('parentUid').value,
         type: this.forumGroup.get('type').value,
         title: tempTitle,
         title_lowercase: tempTitle.toLowerCase(),
-        description: this.forumGroup.get('description').value != undefined ? this.forumGroup.get('description').value.trim() : '',
-        website: this.forumGroup.get('website').value != undefined ? this.forumGroup.get('website').value.trim() : '',
-        indexed: this.forumGroup.get('indexed').value != undefined ? this.forumGroup.get('indexed').value : false,
-        includeDescriptionInDetailPage: false,
-        includeImagesInDetailPage: false,
-        includeTagsInDetailPage: false,
+        description: this.forumGroup.get('description').value.trim(),
+        website: this.forumGroup.get('website').value.trim(),
+        indexed: this.forumGroup.get('indexed').value,
+        includeDescriptionInDetailPage: this.forumGroup.get('includeDescriptionInDetailPage').value,
+        includeImagesInDetailPage: this.forumGroup.get('includeImagesInDetailPage').value,
+        includeTagsInDetailPage: this.forumGroup.get('includeTagsInDetailPage').value,
         lastUpdateDate: firebase.firestore.FieldValue.serverTimestamp(),
         creationDate: firebase.firestore.FieldValue.serverTimestamp()
       };
 
-      this.userForumService.create(this.auth.uid, data).then(forumId => {
+      this.userForumService.create(this.forumGroup.get('uid').value, data).then(forumId => {
         if (this._selectedTags.length > 0){
           var promises = this._selectedTags.map(tag => {
             return new Promise<void>((resolve, reject) => {
-              this.userForumTagService.exists(this.auth.uid, forumId, tag.tagId).then(exists => {
+              this.userForumTagService.exists(this.forumGroup.get('uid').value, forumId, tag.tagId).then(exists => {
                 if (!exists){
-                  this.userForumTagService.getTagCount(this.auth.uid, forumId).then(count => {
+                  this.userForumTagService.getTagCount(this.forumGroup.get('uid').value, forumId).then(count => {
                     if (count < 5){
-                      this.userForumTagService.create(this.auth.uid, forumId, tag)
+                      this.userForumTagService.create(this.forumGroup.get('uid').value, forumId, tag)
                         .then(() => {
                           // delay to prevent user adding multiple tags simultaneously
                           setTimeout(() => {
