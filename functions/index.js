@@ -26,6 +26,8 @@ const stripeWebhook = require("stripe")(functions.config().keys.webhooks);
 const endpointSecret = functions.config().keys.signing;
 const connectedEndpointSecret = functions.config().keys.connectedsigning;
 
+// firebase functions:config:get
+
 // Automatically allow cross-origin requests
 app.use(cors({ origin: true }));
 
